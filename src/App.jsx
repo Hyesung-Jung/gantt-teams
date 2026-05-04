@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useState, useRef, useEffect, useMemo, useCallback } from “react”;
 
-// ─── Supabase ────────────────────────────────────────────────────────────────
+// — Supabase ––––––––––––––––––––––––––––––––
 const SUPABASE_URL = “https://yueibaamyinfdiiylzyt.supabase.co”;
 const SUPABASE_KEY = “sb_publishable_PG4PDvjODQqIPF7xYaQpFw_IXOiN5cw”;
 
@@ -43,7 +43,7 @@ resolve(ctx.channel?.id || ctx.chat?.id || “default”);
 return Promise.resolve(“default”);
 }
 
-// ─── SVG Icons ────────────────────────────────────────────────────────────────
+// — SVG Icons ––––––––––––––––––––––––––––––––
 const Icon = ({ d, size=14, stroke=”#94a3b8”, fill=“none”, sw=1.8, …rest }) => (
 <svg width={size} height={size} viewBox=“0 0 24 24” fill={fill} stroke={stroke}
 strokeWidth={sw} strokeLinecap=“round” strokeLinejoin=“round” style={{ flexShrink:0 }} {…rest}>
@@ -109,7 +109,7 @@ const CloseIcon = ({ size=16 }) => (
 <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
 );
 
-// ─── Color helpers ────────────────────────────────────────────────────────────
+// — Color helpers ————————————————————
 const SECTOR_COLORS = [”#6366f1”,”#f43f5e”,”#10b981”,”#f59e0b”,”#3b82f6”,”#8b5cf6”,”#06b6d4”,”#ec4899”];
 
 function hexToRgb(hex) {
@@ -143,7 +143,7 @@ const idx = siblings.findIndex(i=>i.id===item.id);
 return childColor(sector.color, Math.max(idx,0), siblings.length);
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// — Constants ––––––––––––––––––––––––––––––––
 const ROW_HEIGHT = 52;
 const DETAIL_HEIGHT = 110; // height of expanded detail panel
 const COL_NAME = “1fr”;
@@ -166,7 +166,7 @@ const toISO = d => d.toISOString().slice(0,10);
 const parseDate = s => { const d=new Date(s); d.setHours(0,0,0,0); return d; };
 let _uid=20; const uid=()=>++_uid;
 
-// ─── Sort helpers ─────────────────────────────────────────────────────────────
+// — Sort helpers ———————————————————––
 function sortedByDate(raw) {
 const sectors = raw.filter(i=>i.type===“sector”).map((s,si)=>{
 const kids = raw.filter(c=>c.parentId===s.id&&c.start);
@@ -181,7 +181,7 @@ return raw.filter(i=>i.parentId===sector.id)
 return […sectors,…children];
 }
 
-// ─── Initial data ─────────────────────────────────────────────────────────────
+// — Initial data ———————————————————––
 const initialItems = sortedByDate([
 { id:1, type:“sector”, name:“기획”, color:SECTOR_COLORS[0], collapsed:false },
 { id:2, type:“task”, parentId:1, name:“요구사항 분석”, start:addDays(today,-5), end:addDays(today,2), progress:70 },
@@ -196,7 +196,7 @@ const initialItems = sortedByDate([
 { id:11, type:“milestone”, parentId:9, name:“제품 런칭”, start:addDays(today,28), end:addDays(today,28) },
 ]);
 
-// ─── Dep arrows ───────────────────────────────────────────────────────────────
+// — Dep arrows —————————————————————
 function DepArrows({ flatRows, viewStart, DAY_WIDTH, getRowTop }) {
 const arrows = [];
 flatRows.forEach((row, toIdx) => {
@@ -229,7 +229,7 @@ opacity=“0.75” markerEnd=“url(#arr)”/>
 );
 }
 
-// ─── Drag grip icon ───────────────────────────────────────────────────────────
+// — Drag grip icon ———————————————————–
 const GripIcon = ({active}) => (
 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
 {[2,6,10].map(x=>[2,6,10].map(y=>(
@@ -294,7 +294,7 @@ function F({label,children}) {
 return <label style={{display:“flex”,flexDirection:“column”,gap:5,fontSize:11,color:”#64748b”,fontWeight:600,textTransform:“uppercase”,letterSpacing:“0.05em”}}>{label}{children}</label>;
 }
 
-// ─── Left panel row ───────────────────────────────────────────────────────────
+// — Left panel row ———————————————————–
 function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragging,isSelected,
 activeDragId,onActivateDrag,onMoveUp,onMoveDown,canUp,canDown,onTapWhileDragging,onSelect,
 onMouseDownDrag,dropIndicator}) {
@@ -439,7 +439,7 @@ boxShadow:“0 0 6px #6366f1”}}/>
 );
 }
 
-// ─── Kanban View ──────────────────────────────────────────────────────────────
+// — Kanban View –––––––––––––––––––––––––––––––
 const KANBAN_COLS = [
 { key:“todo”, label:“할 일”, color:”#475569” },
 { key:“inprogress”, label:“진행 중”, color:”#6366f1” },
@@ -478,10 +478,10 @@ return (
 <div style={{flex:1, display:“flex”, flexDirection:“column”, background:”#0b0e17”, overflow:“hidden”}}>
 
 ```
-  {/* ── Scrollable container: header + body scroll together horizontally ── */}
+  {/* -- Scrollable container: header + body scroll together horizontally -- */}
   <div style={{flex:1, overflowX:"auto", overflowY:"hidden", display:"flex", flexDirection:"column"}}>
 
-  {/* ── Fixed header: status columns ── */}
+  {/* -- Fixed header: status columns -- */}
   <div style={{display:"flex", flexShrink:0, borderBottom:"2px solid #1e2535", background:"#0d111a", position:"sticky", top:0, zIndex:10,
     minWidth: SECTOR_LABEL_W + KANBAN_COLS.length * COL_W}}>
     {/* top-left corner: sector label column */}
@@ -520,7 +520,7 @@ return (
     ))}
   </div>
 
-  {/* ── Scrollable body ── */}
+  {/* -- Scrollable body -- */}
   <div style={{flex:1, overflowY:"auto", overflowX:"visible", minWidth: SECTOR_LABEL_W + KANBAN_COLS.length * COL_W}}>
     {sectors.map(sector => {
       const isCollapsed = collapsedSectors[sector.id];
@@ -715,7 +715,7 @@ return (
 );
 }
 
-// ─── Main App ─────────────────────────────────────────────────────────────────
+// — Main App —————————————————————–
 // serialize/deserialize dates
 function serializeItems(items) {
 return items.map(item => ({
@@ -765,7 +765,7 @@ window.addEventListener(“resize”,onResize);
 return ()=>window.removeEventListener(“resize”,onResize);
 },[]);
 
-// ── Supabase: 채널 ID 가져오고 데이터 로드 + Teams 멤버 가져오기 ────────────
+// – Supabase: 채널 ID 가져오고 데이터 로드 + Teams 멤버 가져오기 ————
 useEffect(()=>{
 getChannelId().then(async id => {
 setChannelId(id);
@@ -800,7 +800,7 @@ if (window.microsoftTeams) {
 
 }, []);
 
-// ── Supabase: items/projectName 변경 시 자동 저장 (1초 디바운스) ───────────
+// – Supabase: items/projectName 변경 시 자동 저장 (1초 디바운스) ———–
 useEffect(()=>{
 if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
 setDbStatus(“saving”);
@@ -912,7 +912,7 @@ window.addEventListener(“mousemove”,onMove); window.addEventListener(“mous
 return ()=>{window.removeEventListener(“mousemove”,onMove);window.removeEventListener(“mouseup”,onUp);};
 },[dragState,DAY_WIDTH]);
 
-// ── Row drag-and-drop via mouse ─────────────────────────────────────────────
+// – Row drag-and-drop via mouse ———————————————
 useEffect(()=>{
 if (!rowDragState) return;
 const onMove = e => {
@@ -1329,7 +1329,7 @@ onMouseLeave={e=>e.currentTarget.style.background=“transparent”}>
 return (
 <div style={{fontFamily:“Pretendard, Noto Sans KR, sans-serif”,background:”#0f1117”,height:“100vh”,display:“flex”,flexDirection:“column”,overflow:“hidden”,color:”#e2e8f0”,position:“relative”,
 cursor:rowDragState?“grabbing”:“auto”, userSelect:rowDragState?“none”:“auto”}}>
-{/* ── TOP BAR ── */}
+{/* – TOP BAR – */}
 <div style={{padding:isMobile?“10px 12px”:“12px 18px”,background:“linear-gradient(180deg,#161b27,#0f1117)”,borderBottom:“1px solid #1e2535”,display:“flex”,alignItems:“center”,gap:12,flexShrink:0,flexWrap:“wrap”}}>
 <div style={{display:“flex”,alignItems:“center”,gap:10,minWidth:0}}>
 {isMobile&&(
@@ -1419,7 +1419,7 @@ color: activeTab===tab.key ? “#fff” : “#64748b”}}>
     </div>
   )}
 
-  {/* ── KANBAN VIEW ── */}
+  {/* -- KANBAN VIEW -- */}
   {activeTab==="kanban" && (
     <KanbanView
       items={items}
@@ -1436,7 +1436,7 @@ color: activeTab===tab.key ? “#fff” : “#64748b”}}>
     />
   )}
 
-  {/* ── GANTT MAIN ── */}
+  {/* -- GANTT MAIN -- */}
   {activeTab==="gantt" ? (() => {
     // Single scroll container: left panel columns + chart columns scroll together vertically
     // Only the chart scrolls horizontally
@@ -1449,7 +1449,7 @@ color: activeTab===tab.key ? “#fff” : “#64748b”}}>
             style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.5)",zIndex:40}}/>
         )}
 
-        {/* ── LEFT PANEL ── fixed-width column */}
+        {/* -- LEFT PANEL -- fixed-width column */}
         {(showLeftPanel||!leftPanelOverlay)&&(
           <div style={{
             width:leftPanelWidth, flexShrink:0,
@@ -1512,7 +1512,7 @@ color: activeTab===tab.key ? “#fff” : “#64748b”}}>
           </div>
         )}
 
-        {/* ── CHART PANEL ── */}
+        {/* -- CHART PANEL -- */}
         <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden",minWidth:0}}>
           {/* Sticky date header — scrolls only horizontally */}
           <div ref={headerRef} style={{overflowX:"hidden",flexShrink:0,borderBottom:"1px solid #1e2535"}}>
@@ -1632,7 +1632,7 @@ color: activeTab===tab.key ? “#fff” : “#64748b”}}>
     );
   })() : null}
 
-  {/* ── MODAL ── */}
+  {/* -- MODAL -- */}
   {showModal&&form&&(
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.78)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,padding:16}}>
       <div style={{background:"#161b27",border:"1px solid #1e2535",borderRadius:16,padding:"22px 24px",width:"100%",maxWidth:480,maxHeight:"90vh",overflowY:"auto",boxShadow:"0 24px 80px rgba(0,0,0,0.6)"}}>
@@ -1820,7 +1820,7 @@ color: activeTab===tab.key ? “#fff” : “#64748b”}}>
     </div>
   )}
 
-  {/* ── Row drag ghost element ── */}
+  {/* -- Row drag ghost element -- */}
   {rowDragState && (() => {
     const draggingItem = flatRows.find(r => r.item.id === rowDragState.id)?.item;
     if (!draggingItem) return null;
