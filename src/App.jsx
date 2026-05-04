@@ -450,7 +450,7 @@ function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragg
             )}
             <button onClick={e=>{e.stopPropagation();onEdit(item);}}
               style={{display:"flex",alignItems:"center",gap:4,padding:"4px 9px",background:themeKey==="dark"?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.05)",border:"1px solid #1e2535",borderRadius:6,cursor:"pointer",fontSize:11,color:T.textSub,fontWeight:500}}>
-              <EditIcon size={10} color=T.textSub/>편집
+              <EditIcon size={10} color={T.textSub}/>편집
             </button>
             {!isSector && (
               item.link
@@ -460,7 +460,7 @@ function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragg
                   </button>
                 : <button onClick={e=>{e.stopPropagation();onEdit(item);}}
                     style={{display:"flex",alignItems:"center",gap:4,padding:"4px 9px",background:"rgba(255,255,255,0.03)",border:"1px dashed #2a3245",borderRadius:6,cursor:"pointer",fontSize:11,color:T.textDim,fontWeight:500}}>
-                    <LinkIcon size={10} color=T.textDim/>링크 추가
+                    <LinkIcon size={10} color={T.textDim}/>링크 추가
                   </button>
             )}
             <button onClick={e=>{e.stopPropagation();onDelete(item.id);onSelect(null);}}
@@ -539,7 +539,7 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector, themeKey=
             background:themeKey==="dark"?"rgba(255,255,255,0.04)":"rgba(0,0,0,0.04)",border:"1px solid #1e2535",
             borderRadius:6,cursor:"pointer",color:T.textFaint,fontSize:11
           }}>
-            <PlusIcon size={10} color=T.textFaint/>섹터
+            <PlusIcon size={10} color={T.textFaint}/>섹터
           </button>
         </div>
         {/* status column headers */}
@@ -698,8 +698,8 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector, themeKey=
                                 transition:"all 0.15s, opacity 0.1s",
                                 boxShadow: dragCard===card.id?"none":"0 2px 10px rgba(0,0,0,0.25)",
                               }}
-                              onMouseEnter={e=>{ e.currentTarget.style.borderColor=T.border; e.currentTarget.style.transform="translateY(-1px)"; }}
-                              onMouseLeave={e=>{ e.currentTarget.style.borderColor=T.border; e.currentTarget.style.transform=""; }}>
+                              onMouseEnter={e=>{ e.currentTarget.style.borderColor={T.border}; e.currentTarget.style.transform="translateY(-1px)"; }}
+                              onMouseLeave={e=>{ e.currentTarget.style.borderColor={T.border}; e.currentTarget.style.transform=""; }}>
                               {/* type badge + link */}
                               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:7}}>
                                 {card.type==="milestone"
