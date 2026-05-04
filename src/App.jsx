@@ -1136,71 +1136,60 @@ export default function GanttApp() {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const text = e.target.result.replace(/^﻿/, ''); // BOM 제거
-        const lines = text.split(/
-?
-/).filter(l => l.trim());
+        let text = e.target.result;
+        if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+        const lines = text.split("\n").map(l => l.replace(/\r$/, "")).filter(l => l.trim());
         if (lines.length < 2) return;
 
-        // CSV 파싱 (따옴표 처리)
         const parseRow = (line) => {
           const cols = [];
-          let cur = '', inQ = false;
+          let cur = "", inQ = false;
           for (let i = 0; i < line.length; i++) {
             const ch = line[i];
             if (ch === '"') {
               if (inQ && line[i+1] === '"') { cur += '"'; i++; }
               else inQ = !inQ;
-            } else if (ch === ',' && !inQ) {
-              cols.push(cur); cur = '';
+            } else if (ch === "," && !inQ) {
+              cols.push(cur); cur = "";
             } else cur += ch;
           }
           cols.push(cur);
           return cols;
         };
 
-        const headers = parseRow(lines[0]);
         const rows = lines.slice(1).map(parseRow);
-
-        // 섹터 먼저 수집
-        const sectorMap = {}; // name → id
+        const sectorMap = {};
         let maxId = Math.max(...items.map(i => i.id), 100);
         const newItems = [];
 
         rows.forEach(row => {
-          const [sectorName, type, name, start, end, progress, link, deps] = row;
+          const sectorName = row[0], type = row[1], name = row[2];
+          const start = row[3], end = row[4], progress = row[5];
+          const link = row[6];
           if (!sectorName || !name) return;
 
-          // 섹터 없으면 생성
           if (!sectorMap[sectorName]) {
             const sId = ++maxId;
             sectorMap[sectorName] = sId;
             const usedColors = newItems.filter(i=>i.type==="sector").map(i=>i.color);
             const color = SECTOR_COLORS.find(c=>!usedColors.includes(c)) || SECTOR_COLORS[0];
-            newItems.push({
-              id: sId, type: "sector", name: sectorName,
-              color, collapsed: false,
-              order: Object.keys(sectorMap).length - 1
-            });
+            newItems.push({ id:sId, type:"sector", name:sectorName, color, collapsed:false, order:Object.keys(sectorMap).length-1 });
           }
 
           const itemId = ++maxId;
           const itemType = type === "마일스톤" ? "milestone" : "task";
           newItems.push({
-            id: itemId,
-            type: itemType,
+            id: itemId, type: itemType,
             parentId: sectorMap[sectorName],
             name: name.trim(),
             start: start ? parseDate(start) : null,
             end: end ? parseDate(end) : (start ? parseDate(start) : null),
             progress: itemType === "task" ? (parseInt(progress) || 0) : 0,
-            link: link || "",
-            deps: [],
+            link: link || "", deps: [],
             order: newItems.filter(i=>i.parentId===sectorMap[sectorName]).length
           });
         });
 
-        // deps 연결 (이름 기반)
         newItems.forEach(item => {
           const row = rows.find(r => r[2] === item.name);
           if (!row || !row[7]) return;
@@ -1210,15 +1199,16 @@ export default function GanttApp() {
 
         if (newItems.length > 0) {
           setItems(sortedByDate(newItems));
-          alert(`✅ ${newItems.filter(i=>i.type!=="sector").length}개 작업을 가져왔습니다!`);
+          alert("가져오기 완료! " + newItems.filter(i=>i.type!=="sector").length + "개 작업을 불러왔습니다.");
         }
       } catch(err) {
-        alert("❌ 파일을 읽는 중 오류가 발생했습니다. 엑셀에서 내보낸 CSV 파일인지 확인해주세요.");
+        alert("파일을 읽는 중 오류가 발생했습니다. 엑셀에서 내보낸 CSV 파일인지 확인해주세요.");
         console.error(err);
       }
     };
-    reader.readAsText(file, 'UTF-8');
+    reader.readAsText(file, "UTF-8");
   };
+
 
   const exportToExcel=()=>{
     const sectors=items.filter(i=>i.type==="sector");
