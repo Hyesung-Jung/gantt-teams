@@ -1,7 +1,7 @@
 
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 
-const APP_VERSION = "1.0.0";
+const APP_VERSION = "1.1.0";
 
 const SUPABASE_URL = "https://yueibaamyinfdiiylzyt.supabase.co";
 const SUPABASE_KEY = "sb_publishable_PG4PDvjODQqIPF7xYaQpFw_IXOiN5cw";
