@@ -45,14 +45,14 @@ function getChannelId() {
 
 
 // --- SVG Icons ----------------------------------------------------------------
-const Icon = ({ d, size=14, stroke="#94a3b8", fill="none", sw=1.8, ...rest }) => (
+const Icon = ({ d, size=14, stroke=T.textSub, fill="none", sw=1.8, ...rest }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke={stroke}
     strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink:0 }} {...rest}>
     {Array.isArray(d) ? d.map((p,i)=><path key={i} d={p}/>) : <path d={d}/>}
   </svg>
 );
 
-const EditIcon = ({ size=14, color="#64748b" }) => (
+const EditIcon = ({ size=14, color=T.textMuted }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -66,7 +66,7 @@ const TrashIcon = ({ size=14, color="#f87171" }) => (
   </svg>
 );
 
-const PlusIcon = ({ size=14, color="#94a3b8" }) => (
+const PlusIcon = ({ size=14, color=T.textSub }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
   </svg>
@@ -80,11 +80,11 @@ const LinkIcon = ({ size=13, color="#6366f1" }) => (
 );
 
 const ChevronDown = ({ size=12 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke=T.textFaint strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
 );
 
 const ChevronRight = ({ size=12 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke=T.textFaint strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
 );
 
 const ExcelIcon = ({ size=14 }) => (
@@ -146,7 +146,49 @@ function effectiveColor(item, allItems) {
 
 // --- Constants ----------------------------------------------------------------
 const ROW_HEIGHT = 52;
-const DETAIL_HEIGHT = 110; // height of expanded detail panel
+const DETAIL_HEIGHT = 110;
+
+// --- Theme -------------------------------------------------------------------
+const THEMES = {
+  dark: {
+    bg:          "#0f1117",
+    bgDeep:      "#0b0e17",
+    bgCard:      "#161b27",
+    bgRow:       "#131820",
+    bgRowHover:  "#1a1f2e",
+    bgHeader:    "#0d111a",
+    bgInput:     "#0f1117",
+    bgSelected:  "#0f1b30",
+    border:      "#1e2535",
+    borderLight: "#1a2030",
+    text:        "#e2e8f0",
+    textSub:     "#94a3b8",
+    textMuted:   "#64748b",
+    textFaint:   "#475569",
+    textDim:     "#334155",
+  },
+  light: {
+    bg:          "#f8fafc",
+    bgDeep:      "#f1f5f9",
+    bgCard:      "#ffffff",
+    bgRow:       "#f8fafc",
+    bgRowHover:  "#eef2f7",
+    bgHeader:    "#e2e8f0",
+    bgInput:     "#ffffff",
+    bgSelected:  "#eff6ff",
+    border:      "#e2e8f0",
+    borderLight: "#e9eef5",
+    text:        "#0f172a",
+    textSub:     "#334155",
+    textMuted:   "#475569",
+    textFaint:   "#64748b",
+    textDim:     "#94a3b8",
+  },
+};
+
+// Module-level theme ref - updated by GanttApp, used by child components
+let T = THEMES.dark;
+function setGlobalTheme(key) { T = THEMES[key]; } // height of expanded detail panel
 const COL_NAME = "1fr";
 const COL_START = "72px";
 const COL_END = "72px";
@@ -234,7 +276,7 @@ function DepArrows({ flatRows, viewStart, DAY_WIDTH, getRowTop }) {
 const GripIcon = ({active}) => (
   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
     {[2,6,10].map(x=>[2,6,10].map(y=>(
-      <circle key={x+'-'+y} cx={x} cy={y} r="1.3" fill={active?"#818cf8":"#475569"}/>
+      <circle key={x+'-'+y} cx={x} cy={y} r="1.3" fill={active?"#818cf8":T.textFaint}/>
     )))}
   </svg>
 );
@@ -264,7 +306,7 @@ const DragBtn = ({active, onActivate, onMoveUp, onMoveDown, canUp, canDown, onMo
           style={{width:22,height:13,display:"flex",alignItems:"center",justifyContent:"center",
             background:canUp?"rgba(99,102,241,0.3)":"rgba(255,255,255,0.04)",
             border:"none",borderRadius:"3px 3px 0 0",cursor:canUp?"pointer":"default",padding:0}}>
-          <svg width="9" height="6" viewBox="0 0 9 6"><path d="M4.5 0L9 6H0z" fill={canUp?"#818cf8":"#334155"}/></svg>
+          <svg width="9" height="6" viewBox="0 0 9 6"><path d="M4.5 0L9 6H0z" fill={canUp?"#818cf8":T.textDim}/></svg>
         </button>
         <button data-dragbtn="1"
           onClick={e=>{ e.stopPropagation(); e.preventDefault(); onMoveDown(); }}
@@ -272,7 +314,7 @@ const DragBtn = ({active, onActivate, onMoveUp, onMoveDown, canUp, canDown, onMo
           style={{width:22,height:13,display:"flex",alignItems:"center",justifyContent:"center",
             background:canDown?"rgba(99,102,241,0.3)":"rgba(255,255,255,0.04)",
             border:"none",borderRadius:"0 0 3px 3px",cursor:canDown?"pointer":"default",padding:0}}>
-          <svg width="9" height="6" viewBox="0 0 9 6"><path d="M4.5 6L0 0H9z" fill={canDown?"#818cf8":"#334155"}/></svg>
+          <svg width="9" height="6" viewBox="0 0 9 6"><path d="M4.5 6L0 0H9z" fill={canDown?"#818cf8":T.textDim}/></svg>
         </button>
       </div>
     )}
@@ -291,7 +333,7 @@ function Ib({onClick,title,children,sz=28}) {
 }
 
 function F({label,children}) {
-  return <label style={{display:"flex",flexDirection:"column",gap:5,fontSize:11,color:"#64748b",fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em"}}>{label}{children}</label>;
+  return <label style={{display:"flex",flexDirection:"column",gap:5,fontSize:11,color:T.textMuted,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em"}}>{label}{children}</label>;
 }
 
 // --- Left panel row -----------------------------------------------------------
@@ -307,10 +349,10 @@ function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragg
     onSelect(item.id);
   };
   const rowBg = isDragging ? "rgba(99,102,241,0.22)"
-    : isSelected ? (isSector ? "#15203a" : "#0f1b30")
+    : isSelected ? (isSector ? T.bgSelected : T.bgSelected)
     : activeDragId&&!isDragging ? "rgba(99,102,241,0.04)"
-    : hovered ? (isSector ? "#1a1f2e" : "#161b27")
-    : isSector ? "#131820" : "transparent";
+    : hovered ? (isSector ? T.bgRowHover : T.bgCard)
+    : isSector ? T.bgRow : "transparent";
   return (
     <>
       <div onMouseEnter={()=>onHover(item.id)} onMouseLeave={()=>onHover(null)}
@@ -341,7 +383,7 @@ function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragg
         <div style={{overflow:"hidden",paddingLeft: isSector ? 4 : 14,display:"flex",alignItems:"center",gap:5,
           borderLeft: isSector ? "none" : "2px solid #1e2535", marginLeft: isSector ? 0 : 4}}>
           <span style={{fontSize:12,fontWeight:isSector?700:500,
-            color:isSector?"#e2e8f0":"#cbd5e1",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
+            color:isSector?T.text:T.textSub,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
             {item.name}
           </span>
           {item.link && <LinkIcon size={10} color="#6366f1"/>}
@@ -359,24 +401,24 @@ function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragg
             </div>
           )}
         </div>
-        <div style={{textAlign:"center",fontSize:11,color: isSector?"#475569":"#64748b",fontVariantNumeric:"tabular-nums"}}>
+        <div style={{textAlign:"center",fontSize:11,color: isSector?T.textFaint:T.textMuted,fontVariantNumeric:"tabular-nums"}}>
           {!isSector && item.start ? fmtD(item.start) : ""}
         </div>
-        <div style={{textAlign:"center",fontSize:11,color: isSector?"#475569":"#64748b",fontVariantNumeric:"tabular-nums"}}>
+        <div style={{textAlign:"center",fontSize:11,color: isSector?T.textFaint:T.textMuted,fontVariantNumeric:"tabular-nums"}}>
           {!isSector && item.type!=="milestone" && item.end ? fmtD(item.end) : ""}
         </div>
         <div style={{textAlign:"center",fontSize:11,fontWeight:600,
-          color: item.type==="task" ? (item.progress===100?"#10b981":item.progress>0?"#818cf8":"#334155") : "transparent"}}>
+          color: item.type==="task" ? (item.progress===100?"#10b981":item.progress>0?"#818cf8":T.textDim) : "transparent"}}>
           {item.type==="task" ? item.progress+"%" : ""}
         </div>
       </div>
       {isSelected && (
-        <div style={{height:DETAIL_HEIGHT,background:"#0c1424",borderBottom:"1px solid #1e2535",
+        <div style={{height:DETAIL_HEIGHT,background:T.bgSelected,borderBottom:"1px solid #1e2535",
           borderLeft:`3px solid ${c}`,padding:"10px 12px 10px 14px",boxSizing:"border-box",overflow:"hidden"}}>
           {isSector && (
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
               <div style={{width:12,height:12,borderRadius:3,background:item.color,flexShrink:0}}/>
-              <span style={{fontSize:12,color:"#94a3b8"}}>
+              <span style={{fontSize:12,color:T.textSub}}>
                 {(() => { const kids=(allItems||[]).filter(i=>i.parentId===item.id); return '하위 작업 '+kids.length+'개'; })()}
               </span>
             </div>
@@ -384,10 +426,10 @@ function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragg
           {item.type==="task" && (
             <div style={{marginBottom:8}}>
               <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
-                <span style={{fontSize:10,color:"#475569",fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em"}}>진행률</span>
+                <span style={{fontSize:10,color:T.textFaint,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em"}}>진행률</span>
                 <span style={{fontSize:11,fontWeight:700,color:c}}>{item.progress}%</span>
               </div>
-              <div style={{height:4,background:"#1e2535",borderRadius:3,overflow:"hidden"}}>
+              <div style={{height:4,background:T.border,borderRadius:3,overflow:"hidden"}}>
                 <div style={{height:"100%",width:item.progress+"%",background:c,borderRadius:3}}/>
               </div>
             </div>
@@ -395,7 +437,7 @@ function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragg
           <div style={{display:"flex",gap:5,flexWrap:"wrap"}}>
             {isSector && (
               <button onClick={e=>{e.stopPropagation();onToggle(item.id);}}
-                style={{display:"flex",alignItems:"center",gap:4,padding:"4px 9px",background:"rgba(255,255,255,0.04)",border:"1px solid #1e2535",borderRadius:6,cursor:"pointer",fontSize:11,color:"#64748b",fontWeight:500}}>
+                style={{display:"flex",alignItems:"center",gap:4,padding:"4px 9px",background:"rgba(255,255,255,0.04)",border:"1px solid #1e2535",borderRadius:6,cursor:"pointer",fontSize:11,color:T.textMuted,fontWeight:500}}>
                 {item.collapsed?<ChevronRight size={10}/>:<ChevronDown size={10}/>}{item.collapsed?"펼치기":"접기"}
               </button>
             )}
@@ -406,8 +448,8 @@ function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragg
               </button>
             )}
             <button onClick={e=>{e.stopPropagation();onEdit(item);}}
-              style={{display:"flex",alignItems:"center",gap:4,padding:"4px 9px",background:"rgba(255,255,255,0.06)",border:"1px solid #1e2535",borderRadius:6,cursor:"pointer",fontSize:11,color:"#94a3b8",fontWeight:500}}>
-              <EditIcon size={10} color="#94a3b8"/>편집
+              style={{display:"flex",alignItems:"center",gap:4,padding:"4px 9px",background:"rgba(255,255,255,0.06)",border:"1px solid #1e2535",borderRadius:6,cursor:"pointer",fontSize:11,color:T.textSub,fontWeight:500}}>
+              <EditIcon size={10} color=T.textSub/>편집
             </button>
             {!isSector && (
               item.link
@@ -416,8 +458,8 @@ function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragg
                     <LinkIcon size={10} color="#818cf8"/>링크 열기
                   </button>
                 : <button onClick={e=>{e.stopPropagation();onEdit(item);}}
-                    style={{display:"flex",alignItems:"center",gap:4,padding:"4px 9px",background:"rgba(255,255,255,0.03)",border:"1px dashed #2a3245",borderRadius:6,cursor:"pointer",fontSize:11,color:"#334155",fontWeight:500}}>
-                    <LinkIcon size={10} color="#334155"/>링크 추가
+                    style={{display:"flex",alignItems:"center",gap:4,padding:"4px 9px",background:"rgba(255,255,255,0.03)",border:"1px dashed #2a3245",borderRadius:6,cursor:"pointer",fontSize:11,color:T.textDim,fontWeight:500}}>
+                    <LinkIcon size={10} color=T.textDim/>링크 추가
                   </button>
             )}
             <button onClick={e=>{e.stopPropagation();onDelete(item.id);onSelect(null);}}
@@ -441,7 +483,7 @@ function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragg
 
 // --- Kanban View --------------------------------------------------------------
 const KANBAN_COLS = [
-  { key:"todo", label:"할 일", color:"#475569" },
+  { key:"todo", label:"할 일", color:T.textFaint },
   { key:"inprogress", label:"진행 중", color:"#6366f1" },
   { key:"done", label:"완료", color:"#10b981" },
 ];
@@ -475,13 +517,13 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
   const SECTOR_LABEL_W = 160;
 
   return (
-    <div style={{flex:1, display:"flex", flexDirection:"column", background:"#0b0e17", overflow:"hidden"}}>
+    <div style={{flex:1, display:"flex", flexDirection:"column", background:T.bgDeep, overflow:"hidden"}}>
 
       {/* -- Scrollable container: header + body scroll together horizontally -- */}
       <div style={{flex:1, overflowX:"auto", overflowY:"hidden", display:"flex", flexDirection:"column"}}>
 
       {/* -- Fixed header: status columns -- */}
-      <div style={{display:"flex", flexShrink:0, borderBottom:"2px solid #1e2535", background:"#0d111a", position:"sticky", top:0, zIndex:10,
+      <div style={{display:"flex", flexShrink:0, borderBottom:"2px solid #1e2535", background:T.bgHeader, position:"sticky", top:0, zIndex:10,
         minWidth: SECTOR_LABEL_W + KANBAN_COLS.length * COL_W}}>
         {/* top-left corner: sector label column */}
         <div style={{
@@ -489,13 +531,13 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
           display:"flex", alignItems:"center", justifyContent:"space-between",
           padding:"0 14px", borderRight:"1px solid #1e2535", gap:6
         }}>
-          <span style={{fontSize:10,fontWeight:700,color:"#334155",textTransform:"uppercase",letterSpacing:"0.08em"}}>섹터</span>
+          <span style={{fontSize:10,fontWeight:700,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em"}}>섹터</span>
           <button onClick={openAddSector} style={{
             display:"flex",alignItems:"center",gap:4,padding:"4px 8px",
             background:"rgba(255,255,255,0.04)",border:"1px solid #1e2535",
-            borderRadius:6,cursor:"pointer",color:"#475569",fontSize:11
+            borderRadius:6,cursor:"pointer",color:T.textFaint,fontSize:11
           }}>
-            <PlusIcon size={10} color="#475569"/>섹터
+            <PlusIcon size={10} color=T.textFaint/>섹터
           </button>
         </div>
         {/* status column headers */}
@@ -510,7 +552,7 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
             <div style={{width:8,height:8,borderRadius:"50%",background:col.color,flexShrink:0}}/>
             <span style={{fontSize:12,fontWeight:700,color:col.color}}>{col.label}</span>
             <span style={{
-              fontSize:10,color:"#334155",background:"#1e2535",
+              fontSize:10,color:T.textDim,background:T.border,
               borderRadius:10,padding:"1px 8px",marginLeft:"auto"
             }}>
               {sectors.reduce((acc,s)=>acc+getCards(s.id,col.key).length,0)}
@@ -551,14 +593,14 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
                 }}>
                   <div style={{display:"flex",alignItems:"center",gap:8}}>
                     <div style={{width:10,height:10,borderRadius:3,background:sector.color,flexShrink:0}}/>
-                    <span style={{fontSize:13,fontWeight:700,color:"#f1f5f9",flex:1,minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
+                    <span style={{fontSize:13,fontWeight:700,color:T.text,flex:1,minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
                       {sector.name}
                     </span>
                     <button
                       onClick={()=>toggleSector(sector.id)}
                       style={{width:20,height:20,display:"flex",alignItems:"center",justifyContent:"center",
                         background:"transparent",border:"none",cursor:"pointer",flexShrink:0,borderRadius:4,
-                        color:"#475569"}}
+                        color:T.textFaint}}
                       title={isCollapsed?"펼치기":"접기"}>
                       {isCollapsed ? <ChevronRight size={12}/> : <ChevronDown size={12}/>}
                     </button>
@@ -566,7 +608,7 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
                   {/* progress bar */}
                   <div>
                     <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
-                      <span style={{fontSize:9,color:"#475569",fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em"}}>{totalTasks}개 작업</span>
+                      <span style={{fontSize:9,color:T.textFaint,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em"}}>{totalTasks}개 작업</span>
                       <span style={{fontSize:9,fontWeight:700,color:pct===100?"#10b981":sector.color}}>{pct}%</span>
                     </div>
                     <div style={{height:3,background:"rgba(255,255,255,0.07)",borderRadius:2,overflow:"hidden"}}>
@@ -600,10 +642,10 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
                           display:"flex",alignItems:"center",gap:6,
                           padding:"4px 12px",borderRadius:20,
                           background: cards.length>0 ? hexAlpha(col.color,0.12) : "rgba(255,255,255,0.03)",
-                          border:`1px solid ${cards.length>0?hexAlpha(col.color,0.3):"#1e2535"}`,
+                          border:`1px solid ${cards.length>0?hexAlpha(col.color,0.3):T.border}`,
                         }}>
-                          <div style={{width:6,height:6,borderRadius:"50%",background:cards.length>0?col.color:"#334155"}}/>
-                          <span style={{fontSize:12,fontWeight:700,color:cards.length>0?col.color:"#334155"}}>{cards.length}</span>
+                          <div style={{width:6,height:6,borderRadius:"50%",background:cards.length>0?col.color:T.textDim}}/>
+                          <span style={{fontSize:12,fontWeight:700,color:cards.length>0?col.color:T.textDim}}>{cards.length}</span>
                         </div>
                       ) : (
                         /* expanded: just a thin accent line at top */
@@ -654,8 +696,8 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
                                 transition:"all 0.15s, opacity 0.1s",
                                 boxShadow: dragCard===card.id?"none":"0 2px 10px rgba(0,0,0,0.25)",
                               }}
-                              onMouseEnter={e=>{ e.currentTarget.style.borderColor="#2a3245"; e.currentTarget.style.transform="translateY(-1px)"; }}
-                              onMouseLeave={e=>{ e.currentTarget.style.borderColor="#1e2535"; e.currentTarget.style.transform=""; }}>
+                              onMouseEnter={e=>{ e.currentTarget.style.borderColor=T.border; e.currentTarget.style.transform="translateY(-1px)"; }}
+                              onMouseLeave={e=>{ e.currentTarget.style.borderColor=T.border; e.currentTarget.style.transform=""; }}>
                               {/* type badge + link */}
                               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:7}}>
                                 {card.type==="milestone"
@@ -665,14 +707,14 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
                                 {card.link && <LinkIcon size={10} color="#6366f1"/>}
                               </div>
                               {/* name */}
-                              <div style={{fontSize:12,fontWeight:600,color:"#e2e8f0",lineHeight:1.45,marginBottom:7}}>
+                              <div style={{fontSize:12,fontWeight:600,color:T.text,lineHeight:1.45,marginBottom:7}}>
                                 {card.name}
                               </div>
                               {/* meta */}
                               <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:card.type==="task"?8:0}}>
                                 
                                 {card.start && (
-                                  <span style={{fontSize:10,color:"#475569"}}>
+                                  <span style={{fontSize:10,color:T.textFaint}}>
                                     {fmt(card.start)}{card.end && card.type!=="milestone" ? "-"+fmt(card.end) : ""}
                                   </span>
                                 )}
@@ -681,10 +723,10 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
                               {card.type==="task" && (
                                 <div>
                                   <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
-                                    <span style={{fontSize:9,color:"#334155"}}>진행률</span>
+                                    <span style={{fontSize:9,color:T.textDim}}>진행률</span>
                                     <span style={{fontSize:9,fontWeight:700,color:cc}}>{card.progress}%</span>
                                   </div>
-                                  <div style={{height:3,background:"#1e2535",borderRadius:2,overflow:"hidden"}}>
+                                  <div style={{height:3,background:T.border,borderRadius:2,overflow:"hidden"}}>
                                     <div style={{height:"100%",width:card.progress+"%",background:`linear-gradient(90deg,${cc},${hexAlpha(cc,0.7)})`,borderRadius:2}}/>
                                   </div>
                                 </div>
@@ -695,7 +737,7 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
                         {cards.length === 0 && (
                           <div style={{
                             height:56,display:"flex",alignItems:"center",justifyContent:"center",
-                            border:"1px dashed #1e2535",borderRadius:8,color:"#2a3245",fontSize:11,
+                            border:"1px dashed #1e2535",borderRadius:8,color:T.border,fontSize:11,
                           }}>없음</div>
                         )}
                       </div>
@@ -735,6 +777,8 @@ export default function GanttApp() {
   const [channelId, setChannelId] = useState("default");
   const [dbStatus, setDbStatus] = useState("idle"); // idle | saving | saved | error
   const [projectName, setProjectName] = useState("프로젝트 간트");
+  const [themeKey, setThemeKey] = useState("dark");
+  const T = THEMES[themeKey]; // reactive for GanttApp
   const [editingName, setEditingName] = useState(false);
   const saveTimerRef = useRef(null);
   const importInputRef = useRef(null);
@@ -761,6 +805,16 @@ export default function GanttApp() {
     window.addEventListener("resize",onResize);
     return ()=>window.removeEventListener("resize",onResize);
   },[]);
+
+  // Apply theme CSS variables to :root
+  useEffect(()=>{
+    const t = THEMES[themeKey];
+    setGlobalTheme(themeKey);
+    const root = document.documentElement;
+    Object.entries(t).forEach(([k,v]) => root.style.setProperty("--t-"+k, v));
+    document.body.style.background = t.bg;
+    document.body.style.color = t.text;
+  }, [themeKey]);
 
   // -- Supabase: 채널 ID 가져오고 데이터 로드 + Teams 멤버 가져오기 ------------
   useEffect(()=>{
@@ -1248,25 +1302,25 @@ export default function GanttApp() {
   const totalW=days.length*DAY_WIDTH;
 
   const SB = {
-    nav: {padding:"6px 10px",background:"transparent",color:"#94a3b8",border:"1px solid #1e2535",borderRadius:7,cursor:"pointer",fontSize:12,display:"flex",alignItems:"center",gap:5,fontWeight:500},
+    nav: {padding:"6px 10px",background:"transparent",color:T.textSub,border:"1px solid "+T.border,borderRadius:7,cursor:"pointer",fontSize:12,display:"flex",alignItems:"center",gap:5,fontWeight:500},
     today: {padding:"6px 12px",background:"#6366f1",color:"#fff",border:"none",borderRadius:7,cursor:"pointer",fontSize:12,fontWeight:600},
     add: {padding:"7px 13px",background:"linear-gradient(135deg,#6366f1,#8b5cf6)",color:"#fff",border:"none",borderRadius:7,cursor:"pointer",fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:5},
-    sec: {padding:"7px 11px",background:"transparent",color:"#94a3b8",border:"1px solid #1e2535",borderRadius:7,cursor:"pointer",fontSize:12,display:"flex",alignItems:"center",gap:5,fontWeight:500},
-    inp: {background:"#0f1117",border:"1px solid #1e2535",borderRadius:7,padding:"9px 11px",color:"#e2e8f0",fontSize:13,outline:"none",width:"100%",boxSizing:"border-box"},
+    sec: {padding:"7px 11px",background:"transparent",color:T.textSub,border:"1px solid "+T.border,borderRadius:7,cursor:"pointer",fontSize:12,display:"flex",alignItems:"center",gap:5,fontWeight:500},
+    inp: {background:T.bgInput,border:"1px solid "+T.border,borderRadius:7,padding:"9px 11px",color:T.text,fontSize:13,outline:"none",width:"100%",boxSizing:"border-box"},
   };
 
   function ToolbarContent({vertical=false}) {
     return (
       <div style={{display:"flex",flexDirection:vertical?"column":"row",gap:vertical?6:5,alignItems:vertical?"stretch":"center",padding:vertical?"8px 10px":0}}>
         <button onClick={()=>setShowMilestones(v=>!v)}
-          style={{...SB.sec,color:showMilestones?"#818cf8":"#64748b",border:"1px solid "+(showMilestones?"#6366f133":"#1e2535")}}>
-          <MilestoneIcon size={12} color={showMilestones?"#818cf8":"#475569"}/>
+          style={{...SB.sec,color:showMilestones?"#818cf8":T.textMuted,border:"1px solid "+(showMilestones?"#6366f133":T.border)}}>
+          <MilestoneIcon size={12} color={showMilestones?"#818cf8":T.textFaint}/>
           {"마일스톤 "+(showMilestones?"ON":"OFF")}
         </button>
         {linkingFrom&&<button onClick={()=>setLinkingFrom(null)} style={{...SB.sec,color:"#fbbf24",border:"1px solid #92400e"}}>
           {"x 연결 취소"}
         </button>}
-        {!vertical&&<div style={{width:1,height:22,background:"#1e2535"}}/>}
+        {!vertical&&<div style={{width:1,height:22,background:T.border}}/>}
         <button onClick={()=>setViewStart(addDays(viewStart,-Math.max(1,Math.floor(totalDays/4))))} style={SB.nav}>
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
           이전
@@ -1280,19 +1334,35 @@ export default function GanttApp() {
           {ZOOM_LEVELS.map((z,i)=>(
             <button key={z.key} onClick={()=>setZoomIdx(i)}
               style={{padding:"6px 10px",border:"none",cursor:"pointer",fontSize:12,fontWeight:600,
-                background:i===zoomIdx?"#6366f1":"transparent",color:i===zoomIdx?"#fff":"#64748b"}}>
+                background:i===zoomIdx?"#6366f1":"transparent",color:i===zoomIdx?"#fff":T.textMuted}}>
               {z.label}
             </button>
           ))}
         </div>
-        {!vertical&&<div style={{width:1,height:22,background:"#1e2535"}}/>}
+        {!vertical&&<div style={{width:1,height:22,background:T.border}}/>}
         <button onClick={openAddSector} style={{...SB.sec,justifyContent:vertical?"flex-start":"center"}}>
           <PlusIcon size={12}/>{" 섹터"}
         </button>
         <button onClick={()=>openAdd("task")} style={{...SB.add,justifyContent:vertical?"flex-start":"center"}}>
           <PlusIcon size={12} color="#fff"/>{" 작업 추가"}
         </button>
-        {!vertical&&<div style={{width:1,height:22,background:"#1e2535"}}/>}
+        {!vertical&&<div style={{width:1,height:22,background:T.border}}/>}
+        {/* Theme toggle */}
+        <button onClick={()=>setThemeKey(k=>k==="dark"?"light":"dark")}
+          title={themeKey==="dark"?"라이트 모드":"다크 모드"}
+          style={{...SB.sec, padding:"6px 8px"}}>
+          {themeKey==="dark"
+            ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+              </svg>
+            : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              </svg>
+          }
+        </button>
         {/* 숨김 파일 입력 */}
         <input ref={importInputRef} type="file" accept=".csv" style={{display:"none"}}
           onChange={e=>{ if(e.target.files[0]){ importFromCSV(e.target.files[0]); e.target.value=""; } }}/>
@@ -1318,7 +1388,7 @@ export default function GanttApp() {
   }
 
   return (
-    <div style={{fontFamily:"Pretendard, Noto Sans KR, sans-serif",background:"#0f1117",height:"100vh",display:"flex",flexDirection:"column",overflow:"hidden",color:"#e2e8f0",position:"relative",
+    <div style={{fontFamily:"Pretendard, Noto Sans KR, sans-serif",background:T.bg,height:"100vh",display:"flex",flexDirection:"column",overflow:"hidden",color:T.text,position:"relative",
       cursor:rowDragState?"grabbing":"auto", userSelect:rowDragState?"none":"auto"}}>
       {/* -- TOP BAR -- */}
       <div style={{padding:isMobile?"10px 12px":"12px 18px",background:"linear-gradient(180deg,#161b27,#0f1117)",borderBottom:"1px solid #1e2535",display:"flex",alignItems:"center",gap:12,flexShrink:0,flexWrap:"wrap"}}>
@@ -1340,7 +1410,7 @@ export default function GanttApp() {
                 onBlur={()=>setEditingName(false)}
                 onKeyDown={e=>{ if(e.key==="Enter"||e.key==="Escape") setEditingName(false); }}
                 style={{
-                  fontSize:isMobile?14:16, fontWeight:700, color:"#f1f5f9",
+                  fontSize:isMobile?14:16, fontWeight:700, color:T.text,
                   letterSpacing:"-0.02em", background:"transparent",
                   border:"none", borderBottom:"2px solid #6366f1",
                   outline:"none", width: Math.max(projectName.length*11, 120)+"px",
@@ -1352,7 +1422,7 @@ export default function GanttApp() {
                 onClick={()=>setEditingName(true)}
                 title="클릭하여 이름 수정"
                 style={{
-                  fontSize:isMobile?14:16, fontWeight:700, color:"#f1f5f9",
+                  fontSize:isMobile?14:16, fontWeight:700, color:T.text,
                   letterSpacing:"-0.02em", cursor:"text",
                   borderBottom:"2px solid transparent",
                   transition:"border-color 0.15s",
@@ -1364,7 +1434,7 @@ export default function GanttApp() {
                 {projectName}
               </div>
             )}
-            {!isMobile&&<div style={{fontSize:11,color:"#64748b",display:"flex",alignItems:"center",gap:6}}>
+            {!isMobile&&<div style={{fontSize:11,color:T.textMuted,display:"flex",alignItems:"center",gap:6}}>
               {items.filter(i=>i.type!=="sector").length}개 작업
               {dbStatus==="saving"&&<span style={{color:"#f59e0b",fontSize:10}}>o 저장 중...</span>}
               {dbStatus==="saved"&&<span style={{color:"#10b981",fontSize:10}}>o 저장됨</span>}
@@ -1372,7 +1442,7 @@ export default function GanttApp() {
             </div>}
           </div>
         </div>
-        <div style={{display:"flex",background:"#0f1117",border:"1px solid #1e2535",borderRadius:8,overflow:"hidden",flexShrink:0}}>
+        <div style={{display:"flex",background:T.bg,border:"1px solid #1e2535",borderRadius:8,overflow:"hidden",flexShrink:0}}>
           {[
             { key:"gantt", label:"간트" },
             { key:"kanban", label:"칸반" },
@@ -1381,7 +1451,7 @@ export default function GanttApp() {
               style={{padding: isMobile?"6px 10px":"6px 14px", border:"none", cursor:"pointer",
                 fontSize:12, fontWeight:600, transition:"all 0.15s", display:"flex", alignItems:"center", gap:5,
                 background: activeTab===tab.key ? "#6366f1" : "transparent",
-                color: activeTab===tab.key ? "#fff" : "#64748b"}}>
+                color: activeTab===tab.key ? "#fff" : T.textMuted}}>
               
               {!isMobile && <span>{tab.label}</span>}
             </button>
@@ -1404,7 +1474,7 @@ export default function GanttApp() {
       </div>
 
       {isMobile&&menuOpen&&(
-        <div style={{position:"absolute",top:54,right:0,left:0,zIndex:90,background:"#161b27",borderBottom:"1px solid #1e2535",boxShadow:"0 8px 32px rgba(0,0,0,0.5)"}}>
+        <div style={{position:"absolute",top:54,right:0,left:0,zIndex:90,background:T.bgCard,borderBottom:"1px solid #1e2535",boxShadow:"0 8px 32px rgba(0,0,0,0.5)"}}>
           <ToolbarContent vertical={true}/>
         </div>
       )}
@@ -1445,21 +1515,21 @@ export default function GanttApp() {
                 width:leftPanelWidth, flexShrink:0,
                 borderRight:"1px solid #1e2535",
                 display:"flex", flexDirection:"column",
-                background:"#0f1117",
+                background:T.bg,
                 ...(leftPanelOverlay?{position:"absolute",left:0,top:0,bottom:0,zIndex:50,boxShadow:"4px 0 24px rgba(0,0,0,0.5)"}:{})
               }}>
                 {/* Left header (matches chart header height exactly) */}
-                <div style={{flexShrink:0,borderBottom:"1px solid #1e2535",background:"#0d111a"}}>
+                <div style={{flexShrink:0,borderBottom:"1px solid #1e2535",background:T.bgHeader}}>
                   <div style={{height:40,padding:"0 6px 0 4px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                    <span style={{fontSize:11,fontWeight:600,color:"#475569",textTransform:"uppercase",letterSpacing:"0.08em",paddingLeft:8}}>작업 목록</span>
+                    <span style={{fontSize:11,fontWeight:600,color:T.textFaint,textTransform:"uppercase",letterSpacing:"0.08em",paddingLeft:8}}>작업 목록</span>
                     {leftPanelOverlay&&<button onClick={()=>setShowLeftPanel(false)} style={{...SB.nav,padding:"4px 6px"}}><CloseIcon size={14}/></button>}
                   </div>
                   <div style={{display:"grid",gridTemplateColumns:GRID_COLS,alignItems:"center",height:28,padding:"0 6px 0 4px"}}>
                     <div/><div/>
-                    <div style={{fontSize:10,fontWeight:600,color:"#475569",paddingLeft:4}}>작업명</div>
-                    <div style={{fontSize:10,fontWeight:600,color:"#475569",textAlign:"center"}}>시작</div>
-                    <div style={{fontSize:10,fontWeight:600,color:"#475569",textAlign:"center"}}>종료</div>
-                    <div style={{fontSize:10,fontWeight:600,color:"#475569",textAlign:"center"}}>진행</div>
+                    <div style={{fontSize:10,fontWeight:600,color:T.textFaint,paddingLeft:4}}>작업명</div>
+                    <div style={{fontSize:10,fontWeight:600,color:T.textFaint,textAlign:"center"}}>시작</div>
+                    <div style={{fontSize:10,fontWeight:600,color:T.textFaint,textAlign:"center"}}>종료</div>
+                    <div style={{fontSize:10,fontWeight:600,color:T.textFaint,textAlign:"center"}}>진행</div>
                   </div>
                 </div>
                 {/* Left rows - overflow hidden, driven by the single scroll container below */}
@@ -1507,23 +1577,23 @@ export default function GanttApp() {
               {/* Sticky date header - scrolls only horizontally */}
               <div ref={headerRef} style={{overflowX:"hidden",flexShrink:0,borderBottom:"1px solid #1e2535"}}>
                 <div style={{width:totalW,display:"flex",flexDirection:"column"}}>
-                  <div style={{display:"flex",height:40,background:"#0d111a",borderBottom:"1px solid #1a2030"}}>
+                  <div style={{display:"flex",height:40,background:T.bgHeader,borderBottom:"1px solid #1a2030",boxSizing:"border-box"}}>
                     {headerGroups.map((g,i)=>(
-                      <div key={i} style={{width:g.count*DAY_WIDTH,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:600,color:"#475569",borderRight:"1px solid #1a2030"}}>
+                      <div key={i} style={{width:g.count*DAY_WIDTH,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:600,color:T.textFaint,borderRight:"1px solid #1a2030"}}>
                         {g.label}
                       </div>
                     ))}
                   </div>
-                  <div style={{display:"flex",height:28,background:"#0d111a"}}>
+                  <div style={{display:"flex",height:28,background:T.bgHeader}}>
                     {days.map((d,i)=>{
                       const isT=d.getTime()===today.getTime(), isW=d.getDay()===0||d.getDay()===6;
                       return (
                         <div key={i} style={{width:DAY_WIDTH,flexShrink:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
                           background:isT?"rgba(99,102,241,0.15)":isW?"rgba(255,255,255,0.01)":"transparent"}}>
-                          {zoom.key!=="year"&&<span style={{fontSize:DAY_WIDTH<14?7:9,fontWeight:isT?700:400,color:isT?"#818cf8":"#334155"}}>
+                          {zoom.key!=="year"&&<span style={{fontSize:DAY_WIDTH<14?7:9,fontWeight:isT?700:400,color:isT?"#818cf8":T.textDim}}>
                             {zoom.key==="day"||zoom.key==="month"?(d.getMonth()+1)+"/"+d.getDate():zoom.key==="quarter"?d.getDate():""}
                           </span>}
-                          {zoom.key==="day"&&<span style={{fontSize:8,color:isT?"#6366f1":"#334155"}}>
+                          {zoom.key==="day"&&<span style={{fontSize:8,color:isT?"#6366f1":T.textDim}}>
                             {["일","월","화","수","목","금","토"][d.getDay()]}
                           </span>}
                         </div>
@@ -1584,7 +1654,7 @@ export default function GanttApp() {
                           onClick={e=>{e.stopPropagation();if(linkingFrom!==null){handleLinkClick(e,item.id);}else{setSelectedId(prev=>prev===item.id?null:item.id);}}}
                           style={{position:"absolute",left:cx-sz,top:cy-sz,width:sz*2,height:sz*2,cursor:"pointer",zIndex:6}}>
                           <div style={{position:"absolute",inset:3,background:mc,transform:"rotate(45deg)",borderRadius:2}}/>
-                          {DAY_WIDTH>=20&&<div style={{position:"absolute",top:sz*2+2,left:"50%",transform:"translateX(-50%)",fontSize:9,color:"#94a3b8",whiteSpace:"nowrap",fontWeight:600}}>{item.name}</div>}
+                          {DAY_WIDTH>=20&&<div style={{position:"absolute",top:sz*2+2,left:"50%",transform:"translateX(-50%)",fontSize:9,color:T.textSub,whiteSpace:"nowrap",fontWeight:600}}>{item.name}</div>}
                         </div>
                       );
                     }
@@ -1625,21 +1695,21 @@ export default function GanttApp() {
       {/* -- MODAL -- */}
       {showModal&&form&&(
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.78)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,padding:16}}>
-          <div style={{background:"#161b27",border:"1px solid #1e2535",borderRadius:16,padding:"22px 24px",width:"100%",maxWidth:480,maxHeight:"90vh",overflowY:"auto",boxShadow:"0 24px 80px rgba(0,0,0,0.6)"}}>
+          <div style={{background:T.bgCard,border:"1px solid #1e2535",borderRadius:16,padding:"22px 24px",width:"100%",maxWidth:480,maxHeight:"90vh",overflowY:"auto",boxShadow:"0 24px 80px rgba(0,0,0,0.6)"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
-              <h2 style={{margin:0,fontSize:16,fontWeight:700,color:"#f1f5f9"}}>
+              <h2 style={{margin:0,fontSize:16,fontWeight:700,color:T.text}}>
                 {editItem?"항목 편집":form.type==="sector"?"섹터 추가":"작업 추가"}
               </h2>
               <button onClick={()=>setShowModal(false)} style={{...SB.nav,padding:"4px 6px"}}><CloseIcon size={14}/></button>
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:13}}>
               {form.type!=="sector"&&!editItem&&(
-                <div style={{display:"flex",gap:0,background:"#0f1117",borderRadius:10,padding:4}}>
+                <div style={{display:"flex",gap:0,background:T.bg,borderRadius:10,padding:4}}>
                   {[{key:"task",label:" 시간막대",desc:"기간이 있는 작업"},{key:"milestone",label:"&#9670; 마일스톤",desc:"특정 날짜 이벤트"}].map(opt=>(
                     <button key={opt.key} onClick={()=>setForm(f=>({...f,type:opt.key,end:opt.key==="milestone"?f.start:f.end}))}
                       style={{flex:1,padding:"9px 6px",border:"none",borderRadius:8,cursor:"pointer",
                         background:form.type===opt.key?(opt.key==="milestone"?"linear-gradient(135deg,#f59e0b,#d97706)":"linear-gradient(135deg,#6366f1,#8b5cf6)"):"transparent",
-                        color:form.type===opt.key?"#fff":"#64748b",fontWeight:form.type===opt.key?600:400,transition:"all 0.15s",fontSize:12}}>
+                        color:form.type===opt.key?"#fff":T.textMuted,fontWeight:form.type===opt.key?600:400,transition:"all 0.15s",fontSize:12}}>
                       <div>{opt.label}</div>
                       <div style={{fontSize:10,fontWeight:400,marginTop:2,opacity:0.8}}>{opt.desc}</div>
                     </button>
@@ -1688,8 +1758,8 @@ export default function GanttApp() {
                               const dc = effectiveColor(dep, items);
                               return (
                                 <span key={depId} style={{display:"flex",alignItems:"center",gap:5,
-                                  background:"#1e2535",borderRadius:20,padding:"3px 8px 3px 10px",
-                                  fontSize:12,color:"#cbd5e1",border:`1px solid ${hexAlpha(dc,0.4)}`}}>
+                                  background:T.border,borderRadius:20,padding:"3px 8px 3px 10px",
+                                  fontSize:12,color:T.textSub,border:`1px solid ${hexAlpha(dc,0.4)}`}}>
                                   <span style={{width:6,height:6,borderRadius:"50%",background:dc,flexShrink:0,display:"inline-block"}}/>
                                   {dep.name}
                                   <span onClick={()=>toggle(depId)} style={{cursor:"pointer",color:"#f87171",fontWeight:700,fontSize:14,lineHeight:1}}>x</span>
@@ -1698,10 +1768,10 @@ export default function GanttApp() {
                             })}
                           </div>
                         )}
-                        <div style={{background:"#0f1117",border:"1px solid #1e2535",borderRadius:8,
+                        <div style={{background:T.bg,border:"1px solid #1e2535",borderRadius:8,
                           maxHeight:180,overflowY:"auto",WebkitOverflowScrolling:"touch"}}>
                           {candidates.length === 0 && (
-                            <div style={{padding:"10px 12px",fontSize:12,color:"#475569"}}>선택 가능한 작업 없음</div>
+                            <div style={{padding:"10px 12px",fontSize:12,color:T.textFaint}}>선택 가능한 작업 없음</div>
                           )}
                           {sectors.map(sector => {
                             const kids = candidates.filter(i => i.parentId === sector.id);
@@ -1739,13 +1809,13 @@ export default function GanttApp() {
                                         : <div style={{width:7,height:7,borderRadius:"50%",background:tc,flexShrink:0}}/>
                                       }
                                       <div style={{flex:1,minWidth:0}}>
-                                        <div style={{fontSize:12,color: checked?"#e2e8f0":"#94a3b8",
+                                        <div style={{fontSize:12,color: checked?T.text:T.textSub,
                                           fontWeight: checked?600:400,
                                           whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
                                           {task.name}
                                         </div>
                                         {task.start && (
-                                          <div style={{fontSize:10,color:"#475569",marginTop:1}}>
+                                          <div style={{fontSize:10,color:T.textFaint,marginTop:1}}>
                                             {task.type==="milestone" ? toISO(task.start) : toISO(task.start) + " - " + toISO(task.end)}
                                           </div>
                                         )}
@@ -1760,7 +1830,7 @@ export default function GanttApp() {
                         {deps.length > 0 && (
                           <div style={{marginTop:6,textAlign:"right"}}>
                             <span onClick={()=>setForm(f=>({...f,deps:[]}))}
-                              style={{fontSize:11,color:"#475569",cursor:"pointer",textDecoration:"underline"}}>
+                              style={{fontSize:11,color:T.textFaint,cursor:"pointer",textDecoration:"underline"}}>
                               전체 해제
                             </span>
                           </div>
@@ -1785,7 +1855,7 @@ export default function GanttApp() {
                 <F label="색상 미리보기 (섹터 기반 자동 적용)">
                   {(()=>{
                     const sector=items.find(i=>i.id===form.parentId&&i.type==="sector");
-                    if (!sector) return <span style={{fontSize:12,color:"#475569"}}>섹터를 먼저 선택하세요</span>;
+                    if (!sector) return <span style={{fontSize:12,color:T.textFaint}}>섹터를 먼저 선택하세요</span>;
                     const siblings=items.filter(i=>i.parentId===sector.id&&i.type!=="sector");
                     const isNew=!editItem;
                     const cnt=isNew?siblings.length+1:siblings.length;
@@ -1794,8 +1864,8 @@ export default function GanttApp() {
                     return (<div style={{display:"flex",alignItems:"center",gap:10,marginTop:4}}>
                       <div style={{width:28,height:28,borderRadius:7,background:pc,border:"2px solid rgba(255,255,255,0.1)"}}/>
                       <div>
-                        <div style={{fontSize:12,color:"#94a3b8"}}>섹터 <span style={{color:sector.color,fontWeight:600}}>{sector.name}</span> 기반</div>
-                        <div style={{fontSize:11,color:"#475569",marginTop:2}}>같은 섹터 안에서 밝기로 구분됩니다</div>
+                        <div style={{fontSize:12,color:T.textSub}}>섹터 <span style={{color:sector.color,fontWeight:600}}>{sector.name}</span> 기반</div>
+                        <div style={{fontSize:11,color:T.textFaint,marginTop:2}}>같은 섹터 안에서 밝기로 구분됩니다</div>
                       </div>
                     </div>);
                   })()}
@@ -1852,21 +1922,21 @@ export default function GanttApp() {
             {/* name */}
             <div style={{paddingLeft: isSector?4:14, overflow:"hidden", display:"flex", alignItems:"center",
               borderLeft: isSector?"none":"2px solid #2a3555", marginLeft: isSector?0:4}}>
-              <span style={{fontSize:12, fontWeight:isSector?700:500, color:"#f1f5f9",
+              <span style={{fontSize:12, fontWeight:isSector?700:500, color:T.text,
                 whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis"}}>
                 {draggingItem.name}
               </span>
             </div>
             {/* start */}
-            <div style={{textAlign:"center",fontSize:11,color:"#64748b"}}>
+            <div style={{textAlign:"center",fontSize:11,color:T.textMuted}}>
               {draggingItem.start ? `${String(draggingItem.start.getFullYear()).slice(2)}/${String(draggingItem.start.getMonth()+1).padStart(2,'0')}/${String(draggingItem.start.getDate()).padStart(2,'0')}` : ""}
             </div>
             {/* end */}
-            <div style={{textAlign:"center",fontSize:11,color:"#64748b"}}>
+            <div style={{textAlign:"center",fontSize:11,color:T.textMuted}}>
               {draggingItem.end && draggingItem.type!=="milestone" ? `${String(draggingItem.end.getFullYear()).slice(2)}/${String(draggingItem.end.getMonth()+1).padStart(2,'0')}/${String(draggingItem.end.getDate()).padStart(2,'0')}` : ""}
             </div>
             {/* progress */}
-            <div style={{textAlign:"center",fontSize:11,fontWeight:600,color:draggingItem.progress===100?"#10b981":draggingItem.progress>0?"#818cf8":"#334155"}}>
+            <div style={{textAlign:"center",fontSize:11,fontWeight:600,color:draggingItem.progress===100?"#10b981":draggingItem.progress>0?"#818cf8":T.textDim}}>
               {draggingItem.type==="task" ? draggingItem.progress+"%" : ""}
             </div>
           </div>
