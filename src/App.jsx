@@ -1,6 +1,49 @@
 // @ts-nocheck
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 
+// ─── Supabase ────────────────────────────────────────────────────────────────
+const SUPABASE_URL = "https://yueibaamyinfdiiylzyt.supabase.co";
+const SUPABASE_KEY = "sb_publishable_PG4PDvjODQqIPF7xYaQpFw_IXOiN5cw";
+
+async function sbGet(channelId) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/gantt_data?id=eq.${channelId}&select=data`, {
+    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+  });
+  const rows = await res.json();
+  return rows?.[0]?.data ?? null;
+}
+
+async function sbSave(channelId, data) {
+  await fetch(`${SUPABASE_URL}/rest/v1/gantt_data`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json",
+      Prefer: "resolution=merge-duplicates",
+    },
+    body: JSON.stringify({ id: channelId, data, updated_at: new Date().toISOString() }),
+  });
+}
+
+// Teams에서 채널 ID 가져오기 (없으면 기본값)
+function getChannelId() {
+  try {
+    // Teams JS SDK가 로드돼 있으면 context에서 가져옴
+    if (window.microsoftTeams) {
+      return new Promise(resolve => {
+        window.microsoftTeams.app.initialize().then(() => {
+          window.microsoftTeams.app.getContext().then(ctx => {
+            resolve(ctx.channel?.id || ctx.chat?.id || "default");
+          }).catch(() => resolve("default"));
+        }).catch(() => resolve("default"));
+      });
+    }
+  } catch(e) {}
+  return Promise.resolve("default");
+}
+
+
 // ─── SVG Icons ────────────────────────────────────────────────────────────────
 const Icon = ({ d, size=14, stroke="#94a3b8", fill="none", sw=1.8, ...rest }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke={stroke}
@@ -670,9 +713,28 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
 }
 
 // ─── Main App ─────────────────────────────────────────────────────────────────
+// serialize/deserialize dates
+function serializeItems(items) {
+  return items.map(item => ({
+    ...item,
+    start: item.start ? item.start.toISOString() : null,
+    end:   item.end   ? item.end.toISOString()   : null,
+  }));
+}
+function deserializeItems(items) {
+  return items.map(item => ({
+    ...item,
+    start: item.start ? new Date(item.start) : null,
+    end:   item.end   ? new Date(item.end)   : null,
+  }));
+}
+
 export default function GanttApp() {
   const [items, setItems] = useState(initialItems);
   const [activeTab, setActiveTab] = useState('gantt');
+  const [channelId, setChannelId] = useState("default");
+  const [dbStatus, setDbStatus] = useState("idle"); // idle | saving | saved | error
+  const saveTimerRef = useRef(null);
   const [zoomIdx, setZoomIdx] = useState(3);
   const [viewStart, setViewStart] = useState(addDays(today,-7));
   const [showModal, setShowModal] = useState(false);
@@ -696,6 +758,36 @@ export default function GanttApp() {
     window.addEventListener("resize",onResize);
     return ()=>window.removeEventListener("resize",onResize);
   },[]);
+
+  // ── Supabase: 채널 ID 가져오고 데이터 로드 ──────────────────────────────────
+  useEffect(()=>{
+    getChannelId().then(async id => {
+      setChannelId(id);
+      try {
+        const data = await sbGet(id);
+        if (data && Array.isArray(data)) {
+          setItems(deserializeItems(data));
+        }
+      } catch(e) {
+        console.error("Supabase load error:", e);
+      }
+    });
+  }, []);
+
+  // ── Supabase: items 변경 시 자동 저장 (1초 디바운스) ─────────────────────────
+  useEffect(()=>{
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    setDbStatus("saving");
+    saveTimerRef.current = setTimeout(async () => {
+      try {
+        await sbSave(channelId, serializeItems(items));
+        setDbStatus("saved");
+        setTimeout(()=>setDbStatus("idle"), 2000);
+      } catch(e) {
+        setDbStatus("error");
+      }
+    }, 1000);
+  }, [items, channelId]);
 
   const isMobile = viewport.w < 640;
   const isTablet = viewport.w >= 640 && viewport.w < 1024;
@@ -1118,7 +1210,12 @@ export default function GanttApp() {
           </div>
           <div style={{minWidth:0}}>
             <div style={{fontSize:isMobile?14:16,fontWeight:700,color:"#f1f5f9",letterSpacing:"-0.02em"}}>프로젝트 간트</div>
-            {!isMobile&&<div style={{fontSize:11,color:"#64748b"}}>{items.filter(i=>i.type!=="sector").length}개 작업</div>}
+            {!isMobile&&<div style={{fontSize:11,color:"#64748b",display:"flex",alignItems:"center",gap:6}}>
+              {items.filter(i=>i.type!=="sector").length}개 작업
+              {dbStatus==="saving"&&<span style={{color:"#f59e0b",fontSize:10}}>● 저장 중...</span>}
+              {dbStatus==="saved"&&<span style={{color:"#10b981",fontSize:10}}>● 저장됨</span>}
+              {dbStatus==="error"&&<span style={{color:"#f87171",fontSize:10}}>● 저장 실패</span>}
+            </div>}
           </div>
         </div>
         <div style={{display:"flex",background:"#0f1117",border:"1px solid #1e2535",borderRadius:8,overflow:"hidden",flexShrink:0}}>
