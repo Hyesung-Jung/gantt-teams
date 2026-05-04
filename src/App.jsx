@@ -112,7 +112,6 @@ const CloseIcon = ({ size=16 }) => (
 
 // ─── Color helpers ────────────────────────────────────────────────────────────
 const SECTOR_COLORS = ["#6366f1","#f43f5e","#10b981","#f59e0b","#3b82f6","#8b5cf6","#06b6d4","#ec4899"];
-const MEMBERS = ["김민준","이서연","박지훈","최수아","정도윤","한예린"];
 
 function hexToRgb(hex) {
   const h = hex.replace("#","");
@@ -186,15 +185,15 @@ function sortedByDate(raw) {
 // ─── Initial data ─────────────────────────────────────────────────────────────
 const initialItems = sortedByDate([
   { id:1, type:"sector", name:"기획", color:SECTOR_COLORS[0], collapsed:false },
-  { id:2, type:"task", parentId:1, name:"요구사항 분석", start:addDays(today,-5), end:addDays(today,2), progress:70, assignee:"김민준" },
-  { id:3, type:"task", parentId:1, name:"기술 스택 결정", start:addDays(today,1), end:addDays(today,5), progress:0, assignee:"이서연" },
+  { id:2, type:"task", parentId:1, name:"요구사항 분석", start:addDays(today,-5), end:addDays(today,2), progress:70 },
+  { id:3, type:"task", parentId:1, name:"기술 스택 결정", start:addDays(today,1), end:addDays(today,5), progress:0 },
   { id:4, type:"milestone", parentId:1, name:"기획 완료", start:addDays(today,4), end:addDays(today,4) },
   { id:5, type:"sector", name:"개발", color:SECTOR_COLORS[5], collapsed:false },
-  { id:6, type:"task", parentId:5, name:"UI/UX 디자인", start:addDays(today,5), end:addDays(today,12), progress:0, assignee:"박지훈" },
-  { id:7, type:"task", parentId:5, name:"프론트엔드 개발", start:addDays(today,10), end:addDays(today,22), progress:0, assignee:"최수아" },
-  { id:8, type:"task", parentId:5, name:"백엔드 API 개발", start:addDays(today,5), end:addDays(today,20), progress:0, assignee:"정도윤" },
+  { id:6, type:"task", parentId:5, name:"UI/UX 디자인", start:addDays(today,5), end:addDays(today,12), progress:0 },
+  { id:7, type:"task", parentId:5, name:"프론트엔드 개발", start:addDays(today,10), end:addDays(today,22), progress:0 },
+  { id:8, type:"task", parentId:5, name:"백엔드 API 개발", start:addDays(today,5), end:addDays(today,20), progress:0 },
   { id:9, type:"sector", name:"출시", color:SECTOR_COLORS[3], collapsed:false },
-  { id:10, type:"task", parentId:9, name:"QA 테스트", start:addDays(today,20), end:addDays(today,27), progress:0, assignee:"한예린" },
+  { id:10, type:"task", parentId:9, name:"QA 테스트", start:addDays(today,20), end:addDays(today,27), progress:0 },
   { id:11, type:"milestone", parentId:9, name:"제품 런칭", start:addDays(today,28), end:addDays(today,28) },
 ]);
 
@@ -410,11 +409,16 @@ function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragg
               style={{display:"flex",alignItems:"center",gap:4,padding:"4px 9px",background:"rgba(255,255,255,0.06)",border:"1px solid #1e2535",borderRadius:6,cursor:"pointer",fontSize:11,color:"#94a3b8",fontWeight:500}}>
               <EditIcon size={10} color="#94a3b8"/>편집
             </button>
-            {!isSector&&item.link&&(
-              <button onClick={e=>{e.stopPropagation();window.open(item.link,"_blank");}}
-                style={{display:"flex",alignItems:"center",gap:4,padding:"4px 9px",background:"rgba(99,102,241,0.12)",border:"1px solid #6366f133",borderRadius:6,cursor:"pointer",fontSize:11,color:"#818cf8",fontWeight:500}}>
-                <LinkIcon size={10} color="#818cf8"/>링크 열기
-              </button>
+            {!isSector && (
+              item.link
+                ? <button onClick={e=>{e.stopPropagation();window.open(item.link,"_blank");}}
+                    style={{display:"flex",alignItems:"center",gap:4,padding:"4px 9px",background:"rgba(99,102,241,0.12)",border:"1px solid #6366f155",borderRadius:6,cursor:"pointer",fontSize:11,color:"#818cf8",fontWeight:500}}>
+                    <LinkIcon size={10} color="#818cf8"/>링크 열기
+                  </button>
+                : <button onClick={e=>{e.stopPropagation();onEdit(item);}}
+                    style={{display:"flex",alignItems:"center",gap:4,padding:"4px 9px",background:"rgba(255,255,255,0.03)",border:"1px dashed #2a3245",borderRadius:6,cursor:"pointer",fontSize:11,color:"#334155",fontWeight:500}}>
+                    <LinkIcon size={10} color="#334155"/>링크 추가
+                  </button>
             )}
             <button onClick={e=>{e.stopPropagation();onDelete(item.id);onSelect(null);}}
               style={{display:"flex",alignItems:"center",gap:4,padding:"4px 9px",background:"rgba(248,113,113,0.08)",border:"1px solid #f8717122",borderRadius:6,cursor:"pointer",fontSize:11,color:"#f87171",fontWeight:500}}>
@@ -664,14 +668,7 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
                               </div>
                               {/* meta */}
                               <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:card.type==="task"?8:0}}>
-                                {card.assignee && (
-                                  <span style={{fontSize:10,color:"#64748b",display:"flex",alignItems:"center",gap:3}}>
-                                    <span style={{width:14,height:14,borderRadius:"50%",background:hexAlpha(cc,0.25),display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:8,color:cc,fontWeight:700}}>
-                                      {card.assignee[0]}
-                                    </span>
-                                    {card.assignee}
-                                  </span>
-                                )}
+                                
                                 {card.start && (
                                   <span style={{fontSize:10,color:"#475569"}}>
                                     {fmt(card.start)}{card.end && card.type!=="milestone" ? "–"+fmt(card.end) : ""}
@@ -734,6 +731,8 @@ export default function GanttApp() {
   const [activeTab, setActiveTab] = useState('gantt');
   const [channelId, setChannelId] = useState("default");
   const [dbStatus, setDbStatus] = useState("idle"); // idle | saving | saved | error
+  const [projectName, setProjectName] = useState("프로젝트 간트");
+  const [editingName, setEditingName] = useState(false);
   const saveTimerRef = useRef(null);
   const [zoomIdx, setZoomIdx] = useState(3);
   const [viewStart, setViewStart] = useState(addDays(today,-7));
@@ -759,35 +758,52 @@ export default function GanttApp() {
     return ()=>window.removeEventListener("resize",onResize);
   },[]);
 
-  // ── Supabase: 채널 ID 가져오고 데이터 로드 ──────────────────────────────────
+  // ── Supabase: 채널 ID 가져오고 데이터 로드 + Teams 멤버 가져오기 ────────────
   useEffect(()=>{
     getChannelId().then(async id => {
       setChannelId(id);
       try {
         const data = await sbGet(id);
-        if (data && Array.isArray(data)) {
-          setItems(deserializeItems(data));
+        if (data) {
+          if (Array.isArray(data)) {
+            // 구버전 포맷 (배열)
+            setItems(deserializeItems(data));
+          } else if (data.items) {
+            // 신버전 포맷 (객체)
+            setItems(deserializeItems(data.items));
+            if (data.projectName) setProjectName(data.projectName);
+          }
         }
       } catch(e) {
         console.error("Supabase load error:", e);
       }
     });
+
+    // Teams 멤버 목록 가져오기
+    if (window.microsoftTeams) {
+      window.microsoftTeams.app.initialize().then(() => {
+        window.microsoftTeams.app.getContext().then(ctx => {
+          // Teams Graph API로 멤버 가져오기 (가능한 경우)
+          // 불가능할 경우 빈 배열 유지 → 수동 입력 폴백
+        }).catch(() => {});
+      }).catch(() => {});
+    }
   }, []);
 
-  // ── Supabase: items 변경 시 자동 저장 (1초 디바운스) ─────────────────────────
+  // ── Supabase: items/projectName 변경 시 자동 저장 (1초 디바운스) ───────────
   useEffect(()=>{
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     setDbStatus("saving");
     saveTimerRef.current = setTimeout(async () => {
       try {
-        await sbSave(channelId, serializeItems(items));
+        await sbSave(channelId, { items: serializeItems(items), projectName });
         setDbStatus("saved");
         setTimeout(()=>setDbStatus("idle"), 2000);
       } catch(e) {
         setDbStatus("error");
       }
     }, 1000);
-  }, [items, channelId]);
+  }, [items, projectName, channelId]);
 
   const isMobile = viewport.w < 640;
   const isTablet = viewport.w >= 640 && viewport.w < 1024;
@@ -1070,7 +1086,7 @@ export default function GanttApp() {
   const openAdd=(type="task",parentId=null)=>{
     const def=parentId||items.find(i=>i.type==="sector")?.id;
     setEditItem(null);
-    setForm({type,parentId:def,name:"",start:toISO(today),end:toISO(addDays(today,7)),progress:0,assignee:"",link:"",deps:[]});
+    setForm({type,parentId:def,name:"",start:toISO(today),end:toISO(addDays(today,7)),progress:0,link:"",deps:[]});
     setShowModal(true); setMenuOpen(false);
   };
 
@@ -1116,13 +1132,13 @@ export default function GanttApp() {
 
   const exportToExcel=()=>{
     const sectors=items.filter(i=>i.type==="sector");
-    const rows=[["섹터","유형","작업명","시작일","종료일","진행률(%)","담당자","링크","의존작업"]];
+    const rows=[["섹터","유형","작업명","시작일","종료일","진행률(%)","링크","의존작업"]];
     sectors.forEach(sector=>{
       items.filter(i=>i.parentId===sector.id).forEach(item=>{
         const depNames=(item.deps||[]).map(d=>items.find(x=>x.id===d)?.name||"").filter(Boolean).join(";");
         rows.push([sector.name,item.type==="milestone"?"마일스톤":"작업",item.name,
           item.start?toISO(item.start):"",item.end?toISO(item.end):"",
-          item.type==="task"?item.progress:"",item.assignee||"",item.link||"",depNames]);
+          item.type==="task"?item.progress:"",item.link||"",depNames]);
       });
     });
     const csv=rows.map(r=>r.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(",")).join("\n");
@@ -1209,7 +1225,38 @@ export default function GanttApp() {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><rect x="3" y="4" width="18" height="4" rx="1"/><rect x="3" y="10" width="12" height="4" rx="1"/><rect x="3" y="16" width="8" height="4" rx="1"/></svg>
           </div>
           <div style={{minWidth:0}}>
-            <div style={{fontSize:isMobile?14:16,fontWeight:700,color:"#f1f5f9",letterSpacing:"-0.02em"}}>프로젝트 간트</div>
+            {editingName ? (
+              <input
+                autoFocus
+                value={projectName}
+                onChange={e=>setProjectName(e.target.value)}
+                onBlur={()=>setEditingName(false)}
+                onKeyDown={e=>{ if(e.key==="Enter"||e.key==="Escape") setEditingName(false); }}
+                style={{
+                  fontSize:isMobile?14:16, fontWeight:700, color:"#f1f5f9",
+                  letterSpacing:"-0.02em", background:"transparent",
+                  border:"none", borderBottom:"2px solid #6366f1",
+                  outline:"none", width: Math.max(projectName.length*11, 120)+"px",
+                  padding:"0 2px",
+                }}
+              />
+            ) : (
+              <div
+                onClick={()=>setEditingName(true)}
+                title="클릭하여 이름 수정"
+                style={{
+                  fontSize:isMobile?14:16, fontWeight:700, color:"#f1f5f9",
+                  letterSpacing:"-0.02em", cursor:"text",
+                  borderBottom:"2px solid transparent",
+                  transition:"border-color 0.15s",
+                  padding:"0 2px",
+                }}
+                onMouseEnter={e=>e.currentTarget.style.borderBottomColor="#6366f144"}
+                onMouseLeave={e=>e.currentTarget.style.borderBottomColor="transparent"}
+              >
+                {projectName}
+              </div>
+            )}
             {!isMobile&&<div style={{fontSize:11,color:"#64748b",display:"flex",alignItems:"center",gap:6}}>
               {items.filter(i=>i.type!=="sector").length}개 작업
               {dbStatus==="saving"&&<span style={{color:"#f59e0b",fontSize:10}}>● 저장 중...</span>}
@@ -1506,12 +1553,6 @@ export default function GanttApp() {
                   </select>
                 </F>
                 {form.type==="task"&&(<>
-                  <F label="담당자">
-                    <select value={form.assignee||""} onChange={e=>setForm({...form,assignee:e.target.value})} style={SB.inp}>
-                      <option value="">없음</option>
-                      {MEMBERS.map(m=><option key={m}>{m}</option>)}
-                    </select>
-                  </F>
                   <F label={'진행률: ' + (form.progress||0) + '%'}>
                     <input type="range" min={0} max={100} value={form.progress||0} onChange={e=>setForm({...form,progress:+e.target.value})} style={{width:"100%",accentColor:"#6366f1"}}/>
                   </F>
