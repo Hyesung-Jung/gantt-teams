@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 
-const APP_VERSION = "1.0.0"; // 배포할때마다 올려주세요
+const APP_VERSION = "1.0.2"; // 배포할때마다 올려주세요
 
 // --- Supabase ----------------------------------------------------------------
 const SUPABASE_URL = "https://yueibaamyinfdiiylzyt.supabase.co";
