@@ -734,6 +734,7 @@ export default function GanttApp() {
   const [projectName, setProjectName] = useState("프로젝트 간트");
   const [editingName, setEditingName] = useState(false);
   const saveTimerRef = useRef(null);
+  const importInputRef = useRef(null);
   const [zoomIdx, setZoomIdx] = useState(3);
   const [viewStart, setViewStart] = useState(addDays(today,-7));
   const [showModal, setShowModal] = useState(false);
@@ -1130,6 +1131,95 @@ export default function GanttApp() {
     setLinkingFrom(null);
   };
 
+  // ── CSV 임포트 ────────────────────────────────────────────────────────────────
+  const importFromCSV = (file) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target.result.replace(/^﻿/, ''); // BOM 제거
+        const lines = text.split(/
+?
+/).filter(l => l.trim());
+        if (lines.length < 2) return;
+
+        // CSV 파싱 (따옴표 처리)
+        const parseRow = (line) => {
+          const cols = [];
+          let cur = '', inQ = false;
+          for (let i = 0; i < line.length; i++) {
+            const ch = line[i];
+            if (ch === '"') {
+              if (inQ && line[i+1] === '"') { cur += '"'; i++; }
+              else inQ = !inQ;
+            } else if (ch === ',' && !inQ) {
+              cols.push(cur); cur = '';
+            } else cur += ch;
+          }
+          cols.push(cur);
+          return cols;
+        };
+
+        const headers = parseRow(lines[0]);
+        const rows = lines.slice(1).map(parseRow);
+
+        // 섹터 먼저 수집
+        const sectorMap = {}; // name → id
+        let maxId = Math.max(...items.map(i => i.id), 100);
+        const newItems = [];
+
+        rows.forEach(row => {
+          const [sectorName, type, name, start, end, progress, link, deps] = row;
+          if (!sectorName || !name) return;
+
+          // 섹터 없으면 생성
+          if (!sectorMap[sectorName]) {
+            const sId = ++maxId;
+            sectorMap[sectorName] = sId;
+            const usedColors = newItems.filter(i=>i.type==="sector").map(i=>i.color);
+            const color = SECTOR_COLORS.find(c=>!usedColors.includes(c)) || SECTOR_COLORS[0];
+            newItems.push({
+              id: sId, type: "sector", name: sectorName,
+              color, collapsed: false,
+              order: Object.keys(sectorMap).length - 1
+            });
+          }
+
+          const itemId = ++maxId;
+          const itemType = type === "마일스톤" ? "milestone" : "task";
+          newItems.push({
+            id: itemId,
+            type: itemType,
+            parentId: sectorMap[sectorName],
+            name: name.trim(),
+            start: start ? parseDate(start) : null,
+            end: end ? parseDate(end) : (start ? parseDate(start) : null),
+            progress: itemType === "task" ? (parseInt(progress) || 0) : 0,
+            link: link || "",
+            deps: [],
+            order: newItems.filter(i=>i.parentId===sectorMap[sectorName]).length
+          });
+        });
+
+        // deps 연결 (이름 기반)
+        newItems.forEach(item => {
+          const row = rows.find(r => r[2] === item.name);
+          if (!row || !row[7]) return;
+          const depNames = row[7].split(";").map(s=>s.trim()).filter(Boolean);
+          item.deps = depNames.map(dn => newItems.find(i=>i.name===dn)?.id).filter(Boolean);
+        });
+
+        if (newItems.length > 0) {
+          setItems(sortedByDate(newItems));
+          alert(`✅ ${newItems.filter(i=>i.type!=="sector").length}개 작업을 가져왔습니다!`);
+        }
+      } catch(err) {
+        alert("❌ 파일을 읽는 중 오류가 발생했습니다. 엑셀에서 내보낸 CSV 파일인지 확인해주세요.");
+        console.error(err);
+      }
+    };
+    reader.readAsText(file, 'UTF-8');
+  };
+
   const exportToExcel=()=>{
     const sectors=items.filter(i=>i.type==="sector");
     const rows=[["섹터","유형","작업명","시작일","종료일","진행률(%)","링크","의존작업"]];
@@ -1200,11 +1290,25 @@ export default function GanttApp() {
           <PlusIcon size={12} color="#fff"/>{" 작업 추가"}
         </button>
         {!vertical&&<div style={{width:1,height:22,background:"#1e2535"}}/>}
+        {/* 숨김 파일 입력 */}
+        <input ref={importInputRef} type="file" accept=".csv" style={{display:"none"}}
+          onChange={e=>{ if(e.target.files[0]){ importFromCSV(e.target.files[0]); e.target.value=""; } }}/>
         <button onClick={exportToExcel}
           style={{...SB.sec,color:"#22c55e",border:"1px solid #166534",justifyContent:vertical?"flex-start":"center"}}
           onMouseEnter={e=>e.currentTarget.style.background="rgba(34,197,94,0.1)"}
           onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-          <ExcelIcon size={13}/>{" Excel"}
+          <ExcelIcon size={13}/>{" 내보내기"}
+        </button>
+        <button onClick={()=>importInputRef.current?.click()}
+          style={{...SB.sec,color:"#22c55e",border:"1px solid #166534",justifyContent:vertical?"flex-start":"center"}}
+          onMouseEnter={e=>e.currentTarget.style.background="rgba(34,197,94,0.1)"}
+          onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="12" y1="15" x2="12" y2="9"/>
+            <polyline points="9 12 12 9 15 12"/>
+          </svg>{" 가져오기"}
         </button>
       </div>
     );
