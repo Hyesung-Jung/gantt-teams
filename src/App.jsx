@@ -1140,28 +1140,34 @@ setItems(prev=>prev.map(i=>{ if(i.id!==itemId) return i; const deps=i.deps||[]; 
 setLinkingFrom(null);
 };
 
-// ── CSV 임포트 ────────────────────────────────────────────────────────────────
+// – CSV Import
 const importFromCSV = (file) => {
 const reader = new FileReader();
 reader.onload = (e) => {
 try {
 let text = e.target.result;
 if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
-const lines = text.split(”\n”).map(l => l.replace(/\r$/, “”)).filter(l => l.trim());
+const lines = text.split(”\n”).map(l => l.trimEnd()).filter(l => l.length > 0);
 if (lines.length < 2) return;
 
 ```
+    const DQUOTE = String.fromCharCode(34);
+    const COMMA  = String.fromCharCode(44);
+
     const parseRow = (line) => {
       const cols = [];
-      let cur = "", inQ = false;
+      let cur = "";
+      let inQ = false;
       for (let i = 0; i < line.length; i++) {
         const ch = line[i];
-        if (ch === '"') {
-          if (inQ && line[i+1] === '"') { cur += '"'; i++; }
-          else inQ = !inQ;
-        } else if (ch === "," && !inQ) {
+        if (ch === DQUOTE) {
+          if (inQ && line[i+1] === DQUOTE) { cur += DQUOTE; i++; }
+          else { inQ = !inQ; }
+        } else if (ch === COMMA && !inQ) {
           cols.push(cur); cur = "";
-        } else cur += ch;
+        } else {
+          cur += ch;
+        }
       }
       cols.push(cur);
       return cols;
@@ -1173,46 +1179,51 @@ if (lines.length < 2) return;
     const newItems = [];
 
     rows.forEach(row => {
-      const sectorName = row[0], type = row[1], name = row[2];
-      const start = row[3], end = row[4], progress = row[5];
-      const link = row[6];
+      const sectorName = (row[0] || "").trim();
+      const type       = (row[1] || "").trim();
+      const name       = (row[2] || "").trim();
+      const startStr   = (row[3] || "").trim();
+      const endStr     = (row[4] || "").trim();
+      const progress   = (row[5] || "").trim();
+      const link       = (row[6] || "").trim();
+      const depsStr    = (row[7] || "").trim();
       if (!sectorName || !name) return;
 
       if (!sectorMap[sectorName]) {
         const sId = ++maxId;
         sectorMap[sectorName] = sId;
-        const usedColors = newItems.filter(i=>i.type==="sector").map(i=>i.color);
-        const color = SECTOR_COLORS.find(c=>!usedColors.includes(c)) || SECTOR_COLORS[0];
-        newItems.push({ id:sId, type:"sector", name:sectorName, color, collapsed:false, order:Object.keys(sectorMap).length-1 });
+        const usedColors = newItems.filter(i => i.type === "sector").map(i => i.color);
+        const color = SECTOR_COLORS.find(c => !usedColors.includes(c)) || SECTOR_COLORS[0];
+        newItems.push({ id: sId, type: "sector", name: sectorName, color, collapsed: false, order: Object.keys(sectorMap).length - 1 });
       }
 
-      const itemId = ++maxId;
+      const itemId   = ++maxId;
       const itemType = type === "마일스톤" ? "milestone" : "task";
       newItems.push({
         id: itemId, type: itemType,
         parentId: sectorMap[sectorName],
-        name: name.trim(),
-        start: start ? parseDate(start) : null,
-        end: end ? parseDate(end) : (start ? parseDate(start) : null),
+        name,
+        start: startStr ? parseDate(startStr) : null,
+        end:   endStr   ? parseDate(endStr)   : (startStr ? parseDate(startStr) : null),
         progress: itemType === "task" ? (parseInt(progress) || 0) : 0,
-        link: link || "", deps: [],
-        order: newItems.filter(i=>i.parentId===sectorMap[sectorName]).length
+        link, deps: [],
+        order: newItems.filter(i => i.parentId === sectorMap[sectorName]).length
       });
     });
 
     newItems.forEach(item => {
-      const row = rows.find(r => r[2] === item.name);
+      const row = rows.find(r => (r[2] || "").trim() === item.name);
       if (!row || !row[7]) return;
-      const depNames = row[7].split(";").map(s=>s.trim()).filter(Boolean);
-      item.deps = depNames.map(dn => newItems.find(i=>i.name===dn)?.id).filter(Boolean);
+      const depNames = row[7].split(";").map(s => s.trim()).filter(Boolean);
+      item.deps = depNames.map(dn => newItems.find(i => i.name === dn)).filter(Boolean).map(i => i.id);
     });
 
     if (newItems.length > 0) {
       setItems(sortedByDate(newItems));
-      alert("가져오기 완료! " + newItems.filter(i=>i.type!=="sector").length + "개 작업을 불러왔습니다.");
+      alert("가져오기 완료! " + newItems.filter(i => i.type !== "sector").length + "개 작업을 불러왔습니다.");
     }
   } catch(err) {
-    alert("파일을 읽는 중 오류가 발생했습니다. 엑셀에서 내보낸 CSV 파일인지 확인해주세요.");
+    alert("파일을 읽는 중 오류가 발생했습니다.");
     console.error(err);
   }
 };
