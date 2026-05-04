@@ -168,21 +168,21 @@ const THEMES = {
     textDim:     "#334155",
   },
   light: {
-    bg:          "#f8fafc",
-    bgDeep:      "#f1f5f9",
+    bg:          "#f0f2f7",
+    bgDeep:      "#e8ebf2",
     bgCard:      "#ffffff",
-    bgRow:       "#f8fafc",
-    bgRowHover:  "#eef2f7",
-    bgHeader:    "#e2e8f0",
+    bgRow:       "#f7f8fc",
+    bgRowHover:  "#eef0f8",
+    bgHeader:    "#e8ebf4",
     bgInput:     "#ffffff",
-    bgSelected:  "#eff6ff",
-    border:      "#e2e8f0",
-    borderLight: "#e9eef5",
-    text:        "#0f172a",
-    textSub:     "#334155",
-    textMuted:   "#475569",
-    textFaint:   "#64748b",
-    textDim:     "#94a3b8",
+    bgSelected:  "#eef2ff",
+    border:      "#dde1ee",
+    borderLight: "#e8ebf4",
+    text:        "#1a1f36",
+    textSub:     "#3d4466",
+    textMuted:   "#5a6282",
+    textFaint:   "#7b84a3",
+    textDim:     "#a0a8c0",
   },
 };
 
@@ -276,7 +276,7 @@ function DepArrows({ flatRows, viewStart, DAY_WIDTH, getRowTop }) {
 const GripIcon = ({active}) => (
   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
     {[2,6,10].map(x=>[2,6,10].map(y=>(
-      <circle key={x+'-'+y} cx={x} cy={y} r="1.3" fill={active?"#818cf8":"#e2e8f0"Faint}/>
+      <circle key={x+'-'+y} cx={x} cy={y} r="1.3" fill={active?"#818cf8":"#475569"}/>
     )))}
   </svg>
 );
@@ -306,7 +306,7 @@ const DragBtn = ({active, onActivate, onMoveUp, onMoveDown, canUp, canDown, onMo
           style={{width:22,height:13,display:"flex",alignItems:"center",justifyContent:"center",
             background:canUp?"rgba(99,102,241,0.3)":"rgba(255,255,255,0.04)",
             border:"none",borderRadius:"3px 3px 0 0",cursor:canUp?"pointer":"default",padding:0}}>
-          <svg width="9" height="6" viewBox="0 0 9 6"><path d="M4.5 0L9 6H0z" fill={canUp?"#818cf8":"#e2e8f0"Dim}/></svg>
+          <svg width="9" height="6" viewBox="0 0 9 6"><path d="M4.5 0L9 6H0z" fill={canUp?"#818cf8":"#334155"}/></svg>
         </button>
         <button data-dragbtn="1"
           onClick={e=>{ e.stopPropagation(); e.preventDefault(); onMoveDown(); }}
@@ -314,7 +314,7 @@ const DragBtn = ({active, onActivate, onMoveUp, onMoveDown, canUp, canDown, onMo
           style={{width:22,height:13,display:"flex",alignItems:"center",justifyContent:"center",
             background:canDown?"rgba(99,102,241,0.3)":"rgba(255,255,255,0.04)",
             border:"none",borderRadius:"0 0 3px 3px",cursor:canDown?"pointer":"default",padding:0}}>
-          <svg width="9" height="6" viewBox="0 0 9 6"><path d="M4.5 6L0 0H9z" fill={canDown?"#818cf8":"#e2e8f0"Dim}/></svg>
+          <svg width="9" height="6" viewBox="0 0 9 6"><path d="M4.5 6L0 0H9z" fill={canDown?"#818cf8":"#334155"}/></svg>
         </button>
       </div>
     )}
@@ -333,13 +333,14 @@ function Ib({onClick,title,children,sz=28}) {
 }
 
 function F({label,children}) {
-  return <label style={{display:"flex",flexDirection:"column",gap:5,fontSize:11,color:"#e2e8f0"Muted,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em"}}>{label}{children}</label>;
+  return <label style={{display:"flex",flexDirection:"column",gap:5,fontSize:11,color:"#64748b",fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em"}}>{label}{children}</label>;
 }
 
 // --- Left panel row -----------------------------------------------------------
 function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragging,isSelected,
   activeDragId,onActivateDrag,onMoveUp,onMoveDown,canUp,canDown,onTapWhileDragging,onSelect,
-  onMouseDownDrag,dropIndicator}) {
+  onMouseDownDrag,dropIndicator,themeKey="dark"}) {
+  const T = THEMES[themeKey];
   const isSector = item.type==="sector";
   const c = isSector ? item.color : effectiveColor(item,allItems||[]);
   const fmtD = d => d ? `${String(d.getFullYear()).slice(2)}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}` : "";
@@ -349,10 +350,10 @@ function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragg
     onSelect(item.id);
   };
   const rowBg = isDragging ? "rgba(99,102,241,0.22)"
-    : isSelected ? (isSector ? "#0f1117"Selected : "#0f1117"Selected)
+    : isSelected ? T.bgSelected
     : activeDragId&&!isDragging ? "rgba(99,102,241,0.04)"
-    : hovered ? (isSector ? "#0f1117"RowHover : "#0f1117"Card)
-    : isSector ? "#0f1117"Row : "transparent";
+    : hovered ? T.bgRowHover
+    : isSector ? T.bgRow : "transparent";
   return (
     <>
       <div onMouseEnter={()=>onHover(item.id)} onMouseLeave={()=>onHover(null)}
@@ -383,7 +384,7 @@ function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragg
         <div style={{overflow:"hidden",paddingLeft: isSector ? 4 : 14,display:"flex",alignItems:"center",gap:5,
           borderLeft: isSector ? "none" : "2px solid #1e2535", marginLeft: isSector ? 0 : 4}}>
           <span style={{fontSize:12,fontWeight:isSector?700:500,
-            color:isSector?"#e2e8f0":"#94a3b8",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
+            color:isSector?T.text:T.textSub,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
             {item.name}
           </span>
           {item.link && <LinkIcon size={10} color="#6366f1"/>}
@@ -401,24 +402,24 @@ function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragg
             </div>
           )}
         </div>
-        <div style={{textAlign:"center",fontSize:11,color: isSector?"#475569":"#64748b",fontVariantNumeric:"tabular-nums"}}>
+        <div style={{textAlign:"center",fontSize:11,color: isSector?T.textFaint:T.textMuted,fontVariantNumeric:"tabular-nums"}}>
           {!isSector && item.start ? fmtD(item.start) : ""}
         </div>
-        <div style={{textAlign:"center",fontSize:11,color: isSector?"#475569":"#64748b",fontVariantNumeric:"tabular-nums"}}>
+        <div style={{textAlign:"center",fontSize:11,color: isSector?T.textFaint:T.textMuted,fontVariantNumeric:"tabular-nums"}}>
           {!isSector && item.type!=="milestone" && item.end ? fmtD(item.end) : ""}
         </div>
         <div style={{textAlign:"center",fontSize:11,fontWeight:600,
-          color: item.type==="task" ? (item.progress===100?"#10b981":item.progress>0?"#818cf8":"#e2e8f0"Dim) : "transparent"}}>
+          color: item.type==="task" ? (item.progress===100?"#10b981":item.progress>0?"#818cf8":T.textDim) : "transparent"}}>
           {item.type==="task" ? item.progress+"%" : ""}
         </div>
       </div>
       {isSelected && (
-        <div style={{height:DETAIL_HEIGHT,background:"#0f1117"Selected,borderBottom:"1px solid #1e2535",
+        <div style={{height:DETAIL_HEIGHT,background:T.bgSelected,borderBottom:`1px solid ${T.border}`,
           borderLeft:`3px solid ${c}`,padding:"10px 12px 10px 14px",boxSizing:"border-box",overflow:"hidden"}}>
           {isSector && (
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
               <div style={{width:12,height:12,borderRadius:3,background:item.color,flexShrink:0}}/>
-              <span style={{fontSize:12,color:"#e2e8f0"Sub}}>
+              <span style={{fontSize:12,color:T.textSub}}>
                 {(() => { const kids=(allItems||[]).filter(i=>i.parentId===item.id); return '하위 작업 '+kids.length+'개'; })()}
               </span>
             </div>
@@ -426,10 +427,10 @@ function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragg
           {item.type==="task" && (
             <div style={{marginBottom:8}}>
               <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
-                <span style={{fontSize:10,color:"#e2e8f0"Faint,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em"}}>진행률</span>
+                <span style={{fontSize:10,color:T.textFaint,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em"}}>진행률</span>
                 <span style={{fontSize:11,fontWeight:700,color:c}}>{item.progress}%</span>
               </div>
-              <div style={{height:4,background:"#1e2535",borderRadius:3,overflow:"hidden"}}>
+              <div style={{height:4,background:T.border,borderRadius:3,overflow:"hidden"}}>
                 <div style={{height:"100%",width:item.progress+"%",background:c,borderRadius:3}}/>
               </div>
             </div>
@@ -437,7 +438,7 @@ function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragg
           <div style={{display:"flex",gap:5,flexWrap:"wrap"}}>
             {isSector && (
               <button onClick={e=>{e.stopPropagation();onToggle(item.id);}}
-                style={{display:"flex",alignItems:"center",gap:4,padding:"4px 9px",background:"rgba(255,255,255,0.04)",border:"1px solid #1e2535",borderRadius:6,cursor:"pointer",fontSize:11,color:"#e2e8f0"Muted,fontWeight:500}}>
+                style={{display:"flex",alignItems:"center",gap:4,padding:"4px 9px",background:T.bgRowHover,border:"1px solid #1e2535",borderRadius:6,cursor:"pointer",fontSize:11,color:T.textMuted,fontWeight:500}}>
                 {item.collapsed?<ChevronRight size={10}/>:<ChevronDown size={10}/>}{item.collapsed?"펼치기":"접기"}
               </button>
             )}
@@ -448,8 +449,8 @@ function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragg
               </button>
             )}
             <button onClick={e=>{e.stopPropagation();onEdit(item);}}
-              style={{display:"flex",alignItems:"center",gap:4,padding:"4px 9px",background:"rgba(255,255,255,0.06)",border:"1px solid #1e2535",borderRadius:6,cursor:"pointer",fontSize:11,color:"#e2e8f0"Sub,fontWeight:500}}>
-              <EditIcon size={10} color="#94a3b8"/>편집
+              style={{display:"flex",alignItems:"center",gap:4,padding:"4px 9px",background:themeKey==="dark"?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.05)",border:"1px solid #1e2535",borderRadius:6,cursor:"pointer",fontSize:11,color:T.textSub,fontWeight:500}}>
+              <EditIcon size={10} color=T.textSub/>편집
             </button>
             {!isSector && (
               item.link
@@ -458,8 +459,8 @@ function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragg
                     <LinkIcon size={10} color="#818cf8"/>링크 열기
                   </button>
                 : <button onClick={e=>{e.stopPropagation();onEdit(item);}}
-                    style={{display:"flex",alignItems:"center",gap:4,padding:"4px 9px",background:"rgba(255,255,255,0.03)",border:"1px dashed #2a3245",borderRadius:6,cursor:"pointer",fontSize:11,color:"#e2e8f0"Dim,fontWeight:500}}>
-                    <LinkIcon size={10} color="#334155"/>링크 추가
+                    style={{display:"flex",alignItems:"center",gap:4,padding:"4px 9px",background:"rgba(255,255,255,0.03)",border:"1px dashed #2a3245",borderRadius:6,cursor:"pointer",fontSize:11,color:T.textDim,fontWeight:500}}>
+                    <LinkIcon size={10} color=T.textDim/>링크 추가
                   </button>
             )}
             <button onClick={e=>{e.stopPropagation();onDelete(item.id);onSelect(null);}}
@@ -483,7 +484,7 @@ function LeftRow({item,hovered,onHover,onEdit,onDelete,onToggle,allItems,isDragg
 
 // --- Kanban View --------------------------------------------------------------
 const KANBAN_COLS = [
-  { key:"todo", label:"할 일", color:"#e2e8f0"Faint },
+  { key:"todo", label:"할 일", color:T.textFaint },
   { key:"inprogress", label:"진행 중", color:"#6366f1" },
   { key:"done", label:"완료", color:"#10b981" },
 ];
@@ -495,7 +496,8 @@ function getKStatus(item) {
   return "inprogress";
 }
 
-function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
+function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector, themeKey="dark" }) {
+  const T = THEMES[themeKey];
   const [dragCard, setDragCard] = useState(null);
   const [dragOver, setDragOver] = useState(null);
   const [collapsedSectors, setCollapsedSectors] = useState({});
@@ -517,13 +519,13 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
   const SECTOR_LABEL_W = 160;
 
   return (
-    <div style={{flex:1, display:"flex", flexDirection:"column", background:"#0f1117"Deep, overflow:"hidden"}}>
+    <div style={{flex:1, display:"flex", flexDirection:"column", background:T.bgDeep, overflow:"hidden"}}>
 
       {/* -- Scrollable container: header + body scroll together horizontally -- */}
       <div style={{flex:1, overflowX:"auto", overflowY:"hidden", display:"flex", flexDirection:"column"}}>
 
       {/* -- Fixed header: status columns -- */}
-      <div style={{display:"flex", flexShrink:0, borderBottom:"2px solid #1e2535", background:"#0f1117"Header, position:"sticky", top:0, zIndex:10,
+      <div style={{display:"flex", flexShrink:0, borderBottom:"2px solid #1e2535", background:T.bgHeader, position:"sticky", top:0, zIndex:10,
         minWidth: SECTOR_LABEL_W + KANBAN_COLS.length * COL_W}}>
         {/* top-left corner: sector label column */}
         <div style={{
@@ -531,13 +533,13 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
           display:"flex", alignItems:"center", justifyContent:"space-between",
           padding:"0 14px", borderRight:"1px solid #1e2535", gap:6
         }}>
-          <span style={{fontSize:10,fontWeight:700,color:"#e2e8f0"Dim,textTransform:"uppercase",letterSpacing:"0.08em"}}>섹터</span>
+          <span style={{fontSize:10,fontWeight:700,color:T.textDim,textTransform:"uppercase",letterSpacing:"0.08em"}}>섹터</span>
           <button onClick={openAddSector} style={{
             display:"flex",alignItems:"center",gap:4,padding:"4px 8px",
-            background:"rgba(255,255,255,0.04)",border:"1px solid #1e2535",
-            borderRadius:6,cursor:"pointer",color:"#e2e8f0"Faint,fontSize:11
+            background:themeKey==="dark"?"rgba(255,255,255,0.04)":"rgba(0,0,0,0.04)",border:"1px solid #1e2535",
+            borderRadius:6,cursor:"pointer",color:T.textFaint,fontSize:11
           }}>
-            <PlusIcon size={10} color="#475569"/>섹터
+            <PlusIcon size={10} color=T.textFaint/>섹터
           </button>
         </div>
         {/* status column headers */}
@@ -552,7 +554,7 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
             <div style={{width:8,height:8,borderRadius:"50%",background:col.color,flexShrink:0}}/>
             <span style={{fontSize:12,fontWeight:700,color:col.color}}>{col.label}</span>
             <span style={{
-              fontSize:10,color:"#e2e8f0"Dim,background:"#1e2535",
+              fontSize:10,color:T.textDim,background:T.border,
               borderRadius:10,padding:"1px 8px",marginLeft:"auto"
             }}>
               {sectors.reduce((acc,s)=>acc+getCards(s.id,col.key).length,0)}
@@ -593,14 +595,14 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
                 }}>
                   <div style={{display:"flex",alignItems:"center",gap:8}}>
                     <div style={{width:10,height:10,borderRadius:3,background:sector.color,flexShrink:0}}/>
-                    <span style={{fontSize:13,fontWeight:700,color:"#e2e8f0",flex:1,minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
+                    <span style={{fontSize:13,fontWeight:700,color:T.text,flex:1,minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
                       {sector.name}
                     </span>
                     <button
                       onClick={()=>toggleSector(sector.id)}
                       style={{width:20,height:20,display:"flex",alignItems:"center",justifyContent:"center",
                         background:"transparent",border:"none",cursor:"pointer",flexShrink:0,borderRadius:4,
-                        color:"#e2e8f0"Faint}}
+                        color:T.textFaint}}
                       title={isCollapsed?"펼치기":"접기"}>
                       {isCollapsed ? <ChevronRight size={12}/> : <ChevronDown size={12}/>}
                     </button>
@@ -608,17 +610,17 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
                   {/* progress bar */}
                   <div>
                     <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
-                      <span style={{fontSize:9,color:"#e2e8f0"Faint,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em"}}>{totalTasks}개 작업</span>
+                      <span style={{fontSize:9,color:T.textFaint,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em"}}>{totalTasks}개 작업</span>
                       <span style={{fontSize:9,fontWeight:700,color:pct===100?"#10b981":sector.color}}>{pct}%</span>
                     </div>
-                    <div style={{height:3,background:"rgba(255,255,255,0.07)",borderRadius:2,overflow:"hidden"}}>
+                    <div style={{height:3,background:themeKey==="dark"?"rgba(255,255,255,0.07)":"rgba(0,0,0,0.06)",borderRadius:2,overflow:"hidden"}}>
                       <div style={{height:"100%",width:pct+"%",background:sector.color,borderRadius:2,transition:"width 0.4s"}}/>
                     </div>
                   </div>
                   {/* add task button */}
                   <button onClick={()=>openAdd("task",sector.id)} style={{
                     display:"flex",alignItems:"center",gap:5,padding:"5px 8px",
-                    background:"rgba(255,255,255,0.04)",border:`1px solid ${hexAlpha(sector.color,0.3)}`,
+                    background:themeKey==="dark"?"rgba(255,255,255,0.04)":"rgba(0,0,0,0.04)",border:`1px solid ${hexAlpha(sector.color,0.3)}`,
                     borderRadius:6,cursor:"pointer",fontSize:11,color:sector.color,fontWeight:500,
                     width:"100%",justifyContent:"center"
                   }}>
@@ -641,11 +643,11 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
                         <div style={{
                           display:"flex",alignItems:"center",gap:6,
                           padding:"4px 12px",borderRadius:20,
-                          background: cards.length>0 ? hexAlpha(col.color,0.12) : "rgba(255,255,255,0.03)",
-                          border:`1px solid ${cards.length>0?hexAlpha(col.color,0.3):"#1e2535"}`,
+                          background: cards.length>0 ? hexAlpha(col.color,0.12) : themeKey==="dark"?"rgba(255,255,255,0.03)":"rgba(99,102,241,0.04)",
+                          border:`1px solid ${cards.length>0?hexAlpha(col.color,0.3):T.border}`,
                         }}>
-                          <div style={{width:6,height:6,borderRadius:"50%",background:cards.length>0?col.color:"#e2e8f0"Dim}}/>
-                          <span style={{fontSize:12,fontWeight:700,color:cards.length>0?col.color:"#e2e8f0"Dim}}>{cards.length}</span>
+                          <div style={{width:6,height:6,borderRadius:"50%",background:cards.length>0?col.color:T.textDim}}/>
+                          <span style={{fontSize:12,fontWeight:700,color:cards.length>0?col.color:T.textDim}}>{cards.length}</span>
                         </div>
                       ) : (
                         /* expanded: just a thin accent line at top */
@@ -687,7 +689,7 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
                               onDragEnd={() => { setDragCard(null); setDragOver(null); }}
                               onClick={() => onEdit(card)}
                               style={{
-                                background:"#131825",
+                                background:T.bgCard,
                                 border:"1px solid #1e2535",
                                 borderTop:`3px solid ${cc}`,
                                 borderRadius:8, padding:"10px 11px",
@@ -696,8 +698,8 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
                                 transition:"all 0.15s, opacity 0.1s",
                                 boxShadow: dragCard===card.id?"none":"0 2px 10px rgba(0,0,0,0.25)",
                               }}
-                              onMouseEnter={e=>{ e.currentTarget.style.borderColor="#1e2535"; e.currentTarget.style.transform="translateY(-1px)"; }}
-                              onMouseLeave={e=>{ e.currentTarget.style.borderColor="#1e2535"; e.currentTarget.style.transform=""; }}>
+                              onMouseEnter={e=>{ e.currentTarget.style.borderColor=T.border; e.currentTarget.style.transform="translateY(-1px)"; }}
+                              onMouseLeave={e=>{ e.currentTarget.style.borderColor=T.border; e.currentTarget.style.transform=""; }}>
                               {/* type badge + link */}
                               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:7}}>
                                 {card.type==="milestone"
@@ -707,14 +709,14 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
                                 {card.link && <LinkIcon size={10} color="#6366f1"/>}
                               </div>
                               {/* name */}
-                              <div style={{fontSize:12,fontWeight:600,color:"#e2e8f0",lineHeight:1.45,marginBottom:7}}>
+                              <div style={{fontSize:12,fontWeight:600,color:T.text,lineHeight:1.45,marginBottom:7}}>
                                 {card.name}
                               </div>
                               {/* meta */}
                               <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:card.type==="task"?8:0}}>
                                 
                                 {card.start && (
-                                  <span style={{fontSize:10,color:"#e2e8f0"Faint}}>
+                                  <span style={{fontSize:10,color:T.textFaint}}>
                                     {fmt(card.start)}{card.end && card.type!=="milestone" ? "-"+fmt(card.end) : ""}
                                   </span>
                                 )}
@@ -723,10 +725,10 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
                               {card.type==="task" && (
                                 <div>
                                   <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
-                                    <span style={{fontSize:9,color:"#e2e8f0"Dim}}>진행률</span>
+                                    <span style={{fontSize:9,color:T.textDim}}>진행률</span>
                                     <span style={{fontSize:9,fontWeight:700,color:cc}}>{card.progress}%</span>
                                   </div>
-                                  <div style={{height:3,background:"#1e2535",borderRadius:2,overflow:"hidden"}}>
+                                  <div style={{height:3,background:T.border,borderRadius:2,overflow:"hidden"}}>
                                     <div style={{height:"100%",width:card.progress+"%",background:`linear-gradient(90deg,${cc},${hexAlpha(cc,0.7)})`,borderRadius:2}}/>
                                   </div>
                                 </div>
@@ -737,7 +739,7 @@ function KanbanView({ items, onEdit, onDelete, openAdd, openAddSector }) {
                         {cards.length === 0 && (
                           <div style={{
                             height:56,display:"flex",alignItems:"center",justifyContent:"center",
-                            border:"1px dashed #1e2535",borderRadius:8,color:"#1e2535",fontSize:11,
+                            border:"1px dashed #1e2535",borderRadius:8,color:T.border,fontSize:11,
                           }}>없음</div>
                         )}
                       </div>
@@ -1302,11 +1304,11 @@ export default function GanttApp() {
   const totalW=days.length*DAY_WIDTH;
 
   const SB = {
-    nav: {padding:"6px 10px",background:"transparent",color:T.textSub,border:"1px solid "+T.border,borderRadius:7,cursor:"pointer",fontSize:12,display:"flex",alignItems:"center",gap:5,fontWeight:500},
+    nav: {padding:"6px 10px",background:"transparent",color:T.textSub,border:`1px solid ${T.border}`,borderRadius:7,cursor:"pointer",fontSize:12,display:"flex",alignItems:"center",gap:5,fontWeight:500},
     today: {padding:"6px 12px",background:"#6366f1",color:"#fff",border:"none",borderRadius:7,cursor:"pointer",fontSize:12,fontWeight:600},
     add: {padding:"7px 13px",background:"linear-gradient(135deg,#6366f1,#8b5cf6)",color:"#fff",border:"none",borderRadius:7,cursor:"pointer",fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:5},
-    sec: {padding:"7px 11px",background:"transparent",color:T.textSub,border:"1px solid "+T.border,borderRadius:7,cursor:"pointer",fontSize:12,display:"flex",alignItems:"center",gap:5,fontWeight:500},
-    inp: {background:T.bgInput,border:"1px solid "+T.border,borderRadius:7,padding:"9px 11px",color:T.text,fontSize:13,outline:"none",width:"100%",boxSizing:"border-box"},
+    sec: {padding:"7px 11px",background:"transparent",color:T.textSub,border:`1px solid ${T.border}`,borderRadius:7,cursor:"pointer",fontSize:12,display:"flex",alignItems:"center",gap:5,fontWeight:500},
+    inp: {background:T.bgInput,border:`1px solid ${T.border}`,borderRadius:7,padding:"9px 11px",color:T.text,fontSize:13,outline:"none",width:"100%",boxSizing:"border-box",colorScheme:themeKey},
   };
 
   function ToolbarContent({vertical=false}) {
@@ -1391,14 +1393,14 @@ export default function GanttApp() {
     <div style={{fontFamily:"Pretendard, Noto Sans KR, sans-serif",background:T.bg,height:"100vh",display:"flex",flexDirection:"column",overflow:"hidden",color:T.text,position:"relative",
       cursor:rowDragState?"grabbing":"auto", userSelect:rowDragState?"none":"auto"}}>
       {/* -- TOP BAR -- */}
-      <div style={{padding:isMobile?"10px 12px":"12px 18px",background:"linear-gradient(180deg,#161b27,#0f1117)",borderBottom:"1px solid #1e2535",display:"flex",alignItems:"center",gap:12,flexShrink:0,flexWrap:"wrap"}}>
+      <div style={{padding:isMobile?"10px 12px":"12px 18px",background:themeKey==="dark"?"linear-gradient(180deg,#161b27,#0f1117)":"linear-gradient(180deg,#ffffff,#f0f2f7)",borderBottom:`1px solid ${T.border}`,display:"flex",alignItems:"center",gap:12,flexShrink:0,flexWrap:"wrap",boxShadow:themeKey==="light"?"0 1px 8px rgba(99,102,241,0.08)":"none"}}>
         <div style={{display:"flex",alignItems:"center",gap:10,minWidth:0}}>
           {isMobile&&(
             <button onClick={()=>setShowLeftPanel(v=>!v)} style={{...SB.nav,padding:"6px 8px",flexShrink:0}}>
               <MenuIcon size={16}/>
             </button>
           )}
-          <div style={{width:30,height:30,background:"linear-gradient(135deg,#6366f1,#8b5cf6)",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+          <div style={{width:30,height:30,background:"linear-gradient(135deg,#6366f1,#8b5cf6)",borderRadius:8,boxShadow:themeKey==="light"?"0 2px 8px rgba(99,102,241,0.3)":"none",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><rect x="3" y="4" width="18" height="4" rx="1"/><rect x="3" y="10" width="12" height="4" rx="1"/><rect x="3" y="16" width="8" height="4" rx="1"/></svg>
           </div>
           <div style={{minWidth:0}}>
@@ -1483,6 +1485,7 @@ export default function GanttApp() {
       {activeTab==="kanban" && (
         <KanbanView
           items={items}
+          themeKey={themeKey}
           onEdit={item => {
             if (item._kanbanMove) {
               setItems(prev => prev.map(i => i.id===item.id ? {...i, progress:item.progress} : i));
@@ -1553,6 +1556,7 @@ export default function GanttApp() {
                           canUp={flatRowsForDrag.findIndex(r=>r.id===item.id)>0}
                           canDown={flatRowsForDrag.findIndex(r=>r.id===item.id)<flatRowsForDrag.length-1}
                           onTapWhileDragging={handleRowTapWhileDragging}
+                          themeKey={themeKey}
                           onMouseDownDrag={e=>{
                             e.preventDefault();
                             e.stopPropagation();
@@ -1625,11 +1629,11 @@ export default function GanttApp() {
                     </div>
                   )}
                   {days.map((d,i)=>(d.getDay()===0||d.getDay()===6)&&(
-                    <div key={i} style={{position:"absolute",left:i*DAY_WIDTH,top:0,width:DAY_WIDTH,height:"100%",background:"rgba(255,255,255,0.012)",pointerEvents:"none"}}/>
+                    <div key={i} style={{position:"absolute",left:i*DAY_WIDTH,top:0,width:DAY_WIDTH,height:"100%",background:themeKey==="dark"?"rgba(255,255,255,0.012)":"rgba(99,102,241,0.03)",pointerEvents:"none"}}/>
                   ))}
                   {flatRows.map((_,i)=>{
                     const rh=getRowHeight(i), rt=getRowTop(i);
-                    return <div key={i} style={{position:"absolute",left:0,top:rt,width:"100%",height:rh,borderBottom:"1px solid #1a2030",pointerEvents:"none"}}/>;
+                    return <div key={i} style={{position:"absolute",left:0,top:rt,width:"100%",height:rh,borderBottom:`1px solid ${T.borderLight}`,pointerEvents:"none"}}/>;
                   })}
                   <DepArrows flatRows={flatRows} viewStart={viewStart} DAY_WIDTH={DAY_WIDTH} getRowTop={getRowTop}/>
                   {flatRows.map(({item},rowIdx)=>{
@@ -1694,8 +1698,8 @@ export default function GanttApp() {
 
       {/* -- MODAL -- */}
       {showModal&&form&&(
-        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.78)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,padding:16}}>
-          <div style={{background:T.bgCard,border:"1px solid #1e2535",borderRadius:16,padding:"22px 24px",width:"100%",maxWidth:480,maxHeight:"90vh",overflowY:"auto",boxShadow:"0 24px 80px rgba(0,0,0,0.6)"}}>
+        <div style={{position:"fixed",inset:0,background:themeKey==="dark"?"rgba(0,0,0,0.78)":"rgba(30,35,60,0.55)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,padding:16}}>
+          <div style={{background:T.bgCard,border:"1px solid #1e2535",borderRadius:16,padding:"22px 24px",width:"100%",maxWidth:480,maxHeight:"90vh",overflowY:"auto",boxShadow:themeKey==="dark"?"0 24px 80px rgba(0,0,0,0.6)":"0 24px 80px rgba(99,102,241,0.15)"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
               <h2 style={{margin:0,fontSize:16,fontWeight:700,color:T.text}}>
                 {editItem?"항목 편집":form.type==="sector"?"섹터 추가":"작업 추가"}
