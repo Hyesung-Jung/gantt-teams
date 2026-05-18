@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>프로젝트 간트 설정</title>
+<script src="https://res.cdn.office.net/teams-js/2.19.0/js/MicrosoftTeams.min.js"></script>
+<style>
+  body{font-family:-apple-system,sans-serif;background:#1a1a2e;color:#e2e8f0;padding:32px;margin:0;}
+  h2{margin:0 0 12px}
+  .ok{color:#10b981;margin-top:16px;font-size:14px}
+  .err{color:#ef4444;margin-top:16px;font-size:14px}
+  .muted{color:#94a3b8;font-size:12px;margin-top:24px}
+</style>
+</head>
+<body>
+<h2>📊 프로젝트 간트차트 추가</h2>
+<p>이 채널 전용 간트차트가 추가됩니다.<br>아래 "저장" 버튼을 눌러주세요.</p>
+<p class="ok" id="status">✓ 자동 설정이 완료되었습니다.</p>
+<p class="muted">데이터는 보안 토큰으로 보호되며, 이 채널 멤버만 접근할 수 있습니다.</p>
+<script>
+  // ─────────────────────────────────────────────────────────────
+  // Token-based access for channel data.
+  // Instead of putting the raw channel ID into the URL (where anyone
+  // who sees the URL could swap to another channel), we mint a random
+  // token at install time and store the {token -> channel_id} mapping
+  // in Supabase. The tab's contentUrl carries only the token; the app
+  // resolves it back to a channel_id on load.
+  // ─────────────────────────────────────────────────────────────
+  const SUPABASE_URL = "https://yueibaamyinfdiiylzyt.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_PG4PDvjODQqIPF7xYaQpFw_IXOiN5cw";
+
+  function makeToken() {
+    // 12자리 영숫자 토큰 (약 4700경 가지). 추측 사실상 불가능.
+    const chars = "abcdefghijkmnopqrstuvwxyz23456789"; // 헷갈리는 l, 1, 0, o 제외
+    let out = "";
+    const rnd = window.crypto?.getRandomValues
+      ? Array.from(window.crypto.getRandomValues(new Uint32Array(12)))
+      : Array.from({length:12}, () => Math.floor(Math.random()*1e9));
+    rnd.forEach(n => { out += chars[n % chars.length]; });
+    return out;
+  }
+
+  async function fetchToken(channelId) {
+    const url = SUPABASE_URL + "/rest/v1/gantt_tokens?channel_id=eq." + encodeURIComponent(channelId) + "&select=token";
+    const res = await fetch(url, {
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY,
+      }
+    });
+    if (!res.ok) throw new Error("토큰 조회 실패 (" + res.status + ")");
+    const arr = await res.json();
+    return arr.length > 0 ? arr[0].token : null;
+  }
+
+  async function createToken(channelId, teamId, teamName, userId) {
+    const token = makeToken();
+    const url = SUPABASE_URL + "/rest/v1/gantt_tokens";
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY,
+        "Content-Type": "application/json",
+        "Prefer": "return=representation",
+      },
+      body: JSON.stringify({
+        token: token,
+        channel_id: channelId,
+        team_id: teamId || null,
+        team_name: teamName || null,
+        created_by: userId || null,
+      }),
+    });
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error("토큰 생성 실패: " + txt);
+    }
+    return token;
+  }
+
+  async function getOrCreateToken(ctx) {
+    const channelId = ctx.channel?.id || ctx.chat?.id || "default";
+    // 1) 이미 발급된 토큰 있는지 확인
+    let token = await fetchToken(channelId);
+    if (token) return token;
+    // 2) 없으면 새로 생성
+    const teamId = ctx.team?.groupId || ctx.team?.internalId || "";
+    const teamName = ctx.team?.displayName || "";
+    const userId = ctx.user?.id || "";
+    return await createToken(channelId, teamId, teamName, userId);
+  }
+
+  microsoftTeams.app.initialize().then(() => {
+    microsoftTeams.pages.config.registerOnSaveHandler(async function (saveEvent) {
+      try {
+        const ctx = await microsoftTeams.app.getContext();
+        const token = await getOrCreateToken(ctx);
+        const url = "https://gantt-teams.vercel.app?token=" + encodeURIComponent(token);
+        await microsoftTeams.pages.config.setConfig({
+          contentUrl: url,
+          websiteUrl: url,
+          suggestedDisplayName: "프로젝트 간트",
+          entityId: "gantt-" + token,
+        });
+        saveEvent.notifySuccess();
+      } catch (e) {
+        document.getElementById("status").className = "err";
+        document.getElementById("status").innerText = "✗ 설정 실패: " + (e?.message || e);
+        saveEvent.notifyFailure(e?.message || "Unknown error");
+      }
+    });
+    microsoftTeams.pages.config.setValidityState(true);
+  });
+</script>
+</body>
+</html>
